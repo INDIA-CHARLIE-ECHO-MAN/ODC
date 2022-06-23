@@ -93,71 +93,64 @@ ui <- fluidPage(
              ),
             
             # Assess DE tab
-             tabPanel(
-              title="Assess DE",
-              dropdown(
-
-                # title of sidepanel
-                 tags$h3("Options"),
-
-                 # inputs in the sidepanel
+            navbarMenu("Assess DE Menu",
+                        
+              tabPanel(
+                title="Cluster Genes",
+                "Cluster genes Page",
+                sidebarPanel(
+                position = c("left"),
+                width = c(4),
+                # inputs in the sidepanel
                 fileInput("DEFile", "Choose DE File",
                   accept = c(
-                   ".csv",
-                   ".tsv",
-                   ".txt"
-                   )
-                ),
-
-                radioButtons(inputId = 'sep', label = 'Separator', choices = c(Comma=',',Semicolon=';',Tab='\t', Space=''), selected = ','),
-
-                # side panel characteristics
-                style = "gradient", icon = icon("cog"),
-                status = "primary", width = "300px",
-                animate = animateOptions(
-                enter = animations$fading_entrances$fadeInLeftBig,
-                exit = animations$fading_exits$fadeOutLeftBig
-                )
-               ),
+                  ".csv",
+                  ".tsv",
+                  ".txt"
+              )
+              ),
+                             
+              radioButtons(inputId = 'sep', label = 'Separator', choices = c(Comma=',',Semicolon=';',Tab='\t', Space=''), selected = ','),
+                          
+              ),
+                           
+                           mainPanel(
+                           # Navigation Bar for types of plots inside cluster
+                           tabsetPanel(
+                             tabPanel(
+                               title="View file",
+                               mainPanel(
+                                 uiOutput("UIDEContent") 
+                               )
+                               
+                             ),
+                             tabPanel(
+                               title="Plot 2"
+                             ),
+                             tabPanel(
+                               title="Plot 3"
+                             )
+                           ),
+              )
+                         ),
               
-              navlistPanel(
-                tabPanel(
-                  title="Cluster Genes",
-                  "Cluster genes Page",
-
-                  # Navigation Bar for types of plots inside cluster
-                  tabsetPanel(
-                    tabPanel(
-                      title="View file",
-                      mainPanel(
-                        uiOutput("UIDEContent") 
-                      )
-                      
-                    ),
-                    tabPanel(
-                      title="Plot 2"
-                    ),
-                    tabPanel(
-                      title="Plot 3"
-                    )
-                  ),
-                ),
-                
-                tabPanel(
-                  title="Gene Connectivity",
-                  "Gene Connectivity Page",
-                ),
-                 
-                 tabPanel(
-                   title="Functional Outliers",
-                   "Functional Outliers Page",
-                 ),
-                 
-                 tabPanel(
-                   title="Gene Set Enrichment Analysis",
-                   "GSE Page",
-                 ),
-               ),
-             )
+                         
+                         tabPanel(
+                           title="Gene Connectivity",
+                           "Gene Connectivity Page",
+                         ),
+                         
+                         tabPanel(
+                           title="Functional Outliers",
+                           "Functional Outliers Page",
+                         ),
+                         
+                         tabPanel(
+                           title="Gene Set Enrichment Analysis",
+                           "GSE Page",
+                         ),
+              
+            ),
+             
   ),
 )
