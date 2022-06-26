@@ -3,7 +3,7 @@ server <- function(input, output, session) {
     hist(rnorm(input$obs), col = 'darkgray', border = 'white')
   })
   # reactive converts the upload file into a reactive expression known as data
-  data <- reactive({
+  data <- eventReactive(input$DEFile,{
 
   # DEFile from fileInput() function
   ServerDEFile <- input$DEFile
