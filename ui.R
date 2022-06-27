@@ -7,7 +7,7 @@ ui <- fluidPage(
   #navbarPage is top menu bar
   navbarPage("",
 
-            #tabPanel is each tab in the navbarPage          
+            # tabPanel is each tab in the navbarPage          
             # Assess DE tab
              tabPanel(
               title="Assess DE",
@@ -16,7 +16,7 @@ ui <- fluidPage(
                 # title of sidepanel
                  tags$h3("Options"),
 
-                 # inputs in the sidepanel
+                # inputs in the sidepanel
                 fileInput("DEFile", "Choose DE File",
                   accept = c(
                    ".csv",
@@ -32,8 +32,8 @@ ui <- fluidPage(
                 style = "gradient", icon = icon("cog"),
                 status = "primary", width = "300px",
                 animate = animateOptions(
-                enter = animations$fading_entrances$fadeInLeftBig,
-                exit = animations$fading_exits$fadeOutLeftBig
+                  enter = animations$fading_entrances$fadeInLeftBig,
+                  exit = animations$fading_exits$fadeOutLeftBig
                 )
                ),
               
@@ -49,7 +49,6 @@ ui <- fluidPage(
                       mainPanel(
                         uiOutput("UIDEContent") 
                       )
-                      
                     ),
                     tabPanel(
                       title="Plot 2"
