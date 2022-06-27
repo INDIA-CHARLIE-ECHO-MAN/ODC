@@ -102,7 +102,7 @@ server <- function(input, output, session) {
 
     # file format checking
     req(ServerDEFile)
-    validate(need(extDEFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
+    # validate(need(extDEFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
 
     # convert data into file format
     if(is.null(extDEFile)){return()}
