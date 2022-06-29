@@ -3,6 +3,19 @@ server <- function(input, output, session) {
     hist(rnorm(input$obs), col = 'darkgray', border = 'white')
   })
   
+  output$upregheatmap <- renderPlot({
+    gene_list <- sample(  EGAD::attr.human$name[EGAD::attr.human$chr=="chrX"], 100 )
+    network_type <- 'generic'
+    sub_nets <- subset_network_hdf5_gene_list(gene_list, network_type, dir="./ODC_backend1/")
+    sub_net <- sub_nets$sub_net
+    node_degrees <-  sub_nets$node_degrees
+    medK <-  as.numeric(sub_nets$median)
+    clust_net <- list() 
+    clust_net[["genes"]]  <- cluster_coexp( sub_net$genes, medK = medK, flag_plot = FALSE )
+    plot_coexpression_heatmap( sub_net$gene, clust_net$gene)
+
+  })
+  
   observe({
     # DEFile from fileInput() function
     ServerDEFile <- req(input$DEFile)
@@ -54,4 +67,5 @@ server <- function(input, output, session) {
   output$UIDEContent <- renderUI({
     tableOutput("DEFileContent")
   })
+  
 }

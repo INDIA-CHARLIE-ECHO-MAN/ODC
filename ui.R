@@ -3,6 +3,13 @@ library(shinythemes)
 library(bslib)
 library(DT)
 library(shiny)
+library(stats)
+library(gplots)
+library(graphics)
+library(viridis)
+library(utils)
+
+
 ui <- fluidPage(
  
   titlePanel(title=div(img(src="ODClogo.png", height = 80), "OutDeCo")),
@@ -200,7 +207,8 @@ ui <- fluidPage(
                       title="Cluster Options"
                     ),
                     tabPanel(
-                      title="Plot 3"
+                      title="upRegResults", 
+                      plotOutput("upregheatmap")
                     )
                   ),
                 ),
