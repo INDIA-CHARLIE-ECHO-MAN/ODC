@@ -44,8 +44,9 @@ server <- function(input, output, session) {
     read.table(file=ServerDEFile$datapath, sep=input$sepButton, header=TRUE, nrows=5)
   })
 
-  # network selection example code for network users
-  NetData <- reactive({
+    
+  observeEvent(input$subnets, {
+    gene_list <- sample(  EGAD::attr.human$name[EGAD::attr.human$chr==input$chooseChrome], input$chooseGeneNo )
 
     option <- input$networkSelect
     if (option == "Blood") {
@@ -57,6 +58,23 @@ server <- function(input, output, session) {
     else {
       network_type <- "generic"
     }
+    
+    output$subnetwork <- renderTable({
+      sub_nets <- subset_network_hdf5_gene_list(gene_list, network_type, dir="../ODC_backend1/")
+    })
+  
+  })  
+    
+
+  # })
+
+  GenerateGeneList <- reactive({
+    output$value <- renderText({ 
+      input$chooseChrome 
+    })
+    output$value <- renderText({ 
+      input$chooseGeneNo 
+    })
   })
 
   # creates reactive table called DEFileContent

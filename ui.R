@@ -182,19 +182,31 @@ ui <- fluidPage(
                             label = "Network Selection",
                             choices = c("Blood", "Brain", "Generic"),
                 ),
+                textInput(inputId = 'chooseChrome', label = 'Choose Chromosome' , value = "", width = NULL, placeholder = "chrX"),
+                textInput(inputId = 'chooseGeneNo', label = 'Choose Number of Genes' , value = "", width = NULL, placeholder = "100"),
+                actionButton("subnets", "Generate Subnetwork"),
+
                 # side panel characteristics
                 style = "jelly", icon = "FILE UPLOAD",
                 status = "success", width = "300px", size = "sm",
 
                ),
+
         
               navlistPanel(
 
                 tabPanel(
-                  title="View File",
-                      mainPanel(
-                      uiOutput("UIDEContent")
-                      )
+                  title="View File", "View File Page", 
+ 
+                  tabsetPanel(
+                    tabPanel(
+                      title="Sub Network", 
+                      tableOutput("subnetwork")
+                    ),
+                    tabPanel(
+                      title="Plot 3"
+                    )
+                  ),
                 ),
 
                 tabPanel(
