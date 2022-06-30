@@ -44,7 +44,7 @@ server <- function(input, output, session) {
     read.table(file=ServerDEFile$datapath, sep=input$sepButton, header=TRUE, nrows=5)
   })
 
-    
+  # Event when the Generate Subnetwork Button is pressed (how do we connect the whole thing tho? )  
   observeEvent(input$subnets, {
     gene_list <- sample(  EGAD::attr.human$name[EGAD::attr.human$chr==input$chooseChrome], input$chooseGeneNo )
 
@@ -64,18 +64,7 @@ server <- function(input, output, session) {
     })
   
   })  
-    
 
-  # })
-
-  GenerateGeneList <- reactive({
-    output$value <- renderText({ 
-      input$chooseChrome 
-    })
-    output$value <- renderText({ 
-      input$chooseGeneNo 
-    })
-  })
 
   # creates reactive table called DEFileContent
   output$DEFileContent <- renderTable({

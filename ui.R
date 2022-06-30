@@ -200,11 +200,12 @@ ui <- fluidPage(
  
                   tabsetPanel(
                     tabPanel(
-                      title="Sub Network", 
-                      tableOutput("subnetwork")
+                      title="File"
+                      
                     ),
                     tabPanel(
-                      title="Plot 3"
+                      title="Subnetwork", 
+                      tableOutput("subnetwork")
                     )
                   ),
                 ),
