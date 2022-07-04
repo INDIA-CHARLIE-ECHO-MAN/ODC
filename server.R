@@ -102,22 +102,6 @@ server <- function(input, output, session) {
   observeEvent(
     {input$run},
     {
-    
-    # # 1. Generate/load gene list eg. X chromosome genes 
-    # gene_list <- sample( EGAD::attr.human$name[EGAD::attr.human$chr=="chrX"], 100 )
-
-    # # 2. Extract sub-network and other network properties
-    # network_type <- 'generic'
-    # sub_nets <- subset_network_hdf5_gene_list(gene_list, network_type, dir="../networks/")
-
-    # # 3. Extract results
-    # sub_net <- sub_nets$sub_net
-    # node_degrees <- sub_nets$node_degrees 
-    # medK <- as.numeric(sub_nets$median)
-
-    # # 4. Run clustering  
-    # clust_net <- list() 
-    # clust_net[["genes"]] <- cluster_coexp( sub_net$genes, medK = medK, flag_plot = FALSE )
 
     sub_nets <- subset_network_hdf5_gene_list(gene_list(), tolower(input$network_type), dir="../networks/")
 
@@ -131,15 +115,15 @@ server <- function(input, output, session) {
     # network output
     output$network <- renderPlot(
       {plot_network( sub_net$gene, clust_net$gene, medK )},
-      # width = 500,
-      # height = 500
+      width = 500,
+      height = 500
     )
 
     # heatmap output
     output$heatmap <- renderPlot(
       {plot_coexpression_heatmap( sub_net$gene, clust_net$gene)},
-      # width = "10",
-      # height = "10"
+      width = 10,
+      height = 10
     )
 
   })

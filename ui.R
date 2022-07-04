@@ -199,6 +199,7 @@ ui <- fluidPage(
                     accept = c(".csv", ".tsv", ".txt")
                   ),
                   # div(style = "margin-top: -25px"),
+                  
                   # button for selecting delimiter, default is nothing until file is selected and handled in server side
                   radioButtons(
                     inputId = 'sepButton', 
