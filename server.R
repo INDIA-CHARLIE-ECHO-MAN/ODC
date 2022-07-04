@@ -64,7 +64,7 @@ server <- function(input, output, session) {
   #   else {
   #       picks generic
   #   }
-  # })
+  # }) extra stuffs so that I can remerge
 
   # creates reactive table called DEFileContent
   output$DEFileContent <- renderTable({
