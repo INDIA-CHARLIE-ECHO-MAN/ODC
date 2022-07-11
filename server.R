@@ -94,8 +94,10 @@ server <- function(input, output, session) {
     show(id = "runGC")
     show(id = "GC_dropdown")
     show(id = "cluster_dropdown")
+    show(id = "FO_dropdown")
     hide(id = "GC_error")
     hide(id = "cluster_error")
+    hide(id = "FO_error")
   })
   
   # Output of subnetowrk table
@@ -279,6 +281,63 @@ server <- function(input, output, session) {
 
     }
   )
+  # FUNCTIONAL OUTLIERS 
+  observeEvent(
+    {input$runFO}, {
+      # Run clustering if not done previously
+      if (is.null(sn$sub_nets)) {
+        sn$sub_nets <- subset_network_hdf5_gene_list(gene_list(), tolower(input$network_type), dir="../networks/")  
+      }
+
+      # Assign variables 
+      sub_net <- sub_nets$sub_net
+      node_degrees <-  sub_nets$node_degrees 
+      medK <-  as.numeric(sub_nets$median)
+
+      clust_net = list() 
+      clust_net[["genes"]]  <- cluster_coexp( sub_net$genes, medK = medK, flag_plot = FALSE )
+
+      filt_min <- input$filtmin
+      clust_size <- plyr::count(clust_net$genes$clusters$labels )
+      clust_keep <-  clust_size[clust_size[,2] < filt_min ,1]
+
+
+      # TEXT OUTPUT FOR FUNCTIONAL OUTLIERS 
+      # Text output for network 
+      output$FOnetworktext = renderText({
+        input$runFO
+        req(input$runFO) #to prevent print at first lauch
+        isolate(print("Density plot of Gene Connectivity"))
+      }) 
+
+      # Text output for heatmap
+      output$FOheatmaptext = renderText({
+        input$runFO
+        req(input$runFO) #to prevent print at first lauch
+        isolate(print("Histogram of Gene Connectivity"))
+      }) 
+
+      # PLOT OUTPUT FOR FUNCTIONAL OUTLIERS 
+      # density output
+      output$FOnetwork <- renderPlot(
+        {plot_network(1-sub_net$gene, clust_net$gene, 1 - medK)},
+        width = 500,
+        height = 500
+      )
+
+
+      # histogram output
+      output$FOheatmap <- renderPlot(
+        {plot_coexpression_heatmap(  sub_net$gene, clust_net$gene, filt=TRUE) },
+        width = 500,
+        height = 500
+      )
+
+
+    } 
+
+  )
+
 
   #ERROR MESSAGES
   output$GC_error = renderText({
@@ -288,6 +347,10 @@ server <- function(input, output, session) {
     output$cluster_error = renderText({
     print("Please upload/generate a gene list in OPTIONS")
   }) 
+
+  output$FO_error = renderText({
+    print("Please upload/generate a gene list in OPTIONS")
+  })
 
 
 }

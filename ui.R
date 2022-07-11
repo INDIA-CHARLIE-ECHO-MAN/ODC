@@ -342,7 +342,7 @@ ui <- fluidPage(
 
                       # ADD XYBREAKS SLIDER FOR HISTOGRAM 
                       conditionalPanel(
-                        condition = "$.inArray('Histogram', input.GCPlotOptions) > -1 || $.inArray('Clustered Histogram', input.GCPlotOptions) > -1" ,
+                        condition = "$.inArray('Histogram', input.GCPlotOptions) > -1 || $.inArray('Clustered Histogram', input.GCPlotOptions) > -1",
                         sliderInput("xybreaks", label = "Number of breaks for histogram:",
                           min = 10, max = 150, value = 100, step = 10
                         ),
@@ -402,15 +402,64 @@ ui <- fluidPage(
                  
                 tabPanel(
                   title="Functional Outliers",
+                  h3("Functional Outliers"),
+                  mainPanel(
+                    dropdown(
+                      inputId = "FO_dropdown",
+                      # title of sidepanel
+                      tags$h4("Functional Outliers Options"),
+
+                      # inputs in the sidepanel
+                      # side panel characteristics
+                      style = "minimal", icon = "PLOT OPTIONS",
+                      status = "primary", width = "300px", size = "sm",
+                     
+                      awesomeCheckboxGroup(
+                        inputId = "FOPlotOptions",
+                        label = "Select Plots", 
+                        choices = c("Network", "Heatmap"),
+                        status = ""
+                        
+                      ),
+
+                      # filt min slider 
+                      sliderInput("filtmin", label = "Minimum no. of genes to Form Module",
+                        min = 0, max = 20, value = 6, step = 2
+                      ),
+                      
+                      br(),
+                      actionButton(inputId = "runFO", label = "Run", 
+                      style="color: #fff; background-color: #3E3F3A; border-color: #20201F"),
                    
-                ),
-                 
-                tabPanel(
-                  title="Gene Set Enrichment Analysis",
-                  "GSE Page",
-                ),
+                    ),
+
+                    br(),
+                    textOutput("FO_error"),
+
+                    conditionalPanel(
+                      br(),
+                      condition = "$.inArray('Network', input.FOPlotOptions) > -1", 
+                      textOutput("FOnetworktext"), 
+                      plotOutput(outputId = "FOnetwork", height = "500px"),
+                      br(),
+                    ),
+
+                    # Histogram Selected
+                    conditionalPanel(
+                      br(),
+                      condition = "$.inArray('Heatmap', input.FOPlotOptions) > -1", 
+                      textOutput("FOnetworktext"), 
+                      plotOutput(outputId = "FOheatmap", height = "500px"),
+                      br(),
+                    ),
+                    
                ),
              )
+
+             tabPanel(
+                title="Gene Set Enrichment Analysis",
+                "GSE Page",
+              ),
   ),
   
 )
