@@ -92,10 +92,13 @@ server <- function(input, output, session) {
   observeEvent(input$generate_subnet, {
     show(id = "run")
     show(id = "runGC")
+    show(id = "runFO")
     show(id = "GC_dropdown")
     show(id = "cluster_dropdown")
     hide(id = "GC_error")
+    hide(id = "FO_error")
     hide(id = "cluster_error")
+    
   })
   
   # Output of subnetowrk table
@@ -280,6 +283,9 @@ server <- function(input, output, session) {
     }
   )
 
+  # FUNCTIONAL OUTLIERS!!! 
+  
+
   #ERROR MESSAGES
   output$GC_error = renderText({
     print("Please upload/generate a gene list in OPTIONS")
@@ -288,6 +294,10 @@ server <- function(input, output, session) {
     output$cluster_error = renderText({
     print("Please upload/generate a gene list in OPTIONS")
   }) 
+
+  output$FO_error = renderText({
+    print("pease upload/generate a gene list in OPTIONS")
+  })
 
 
 }

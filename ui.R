@@ -402,6 +402,48 @@ ui <- fluidPage(
                  
                 tabPanel(
                   title="Functional Outliers",
+                  h3("Functional Outliers"), 
+                  mainPanel(
+                    dropdown(
+                      inputId = "FO_dropdown", 
+
+                      tags$h4("Functional Outliers Options"), 
+
+                      style = "minimal", icon = "PLOT OPTIONS",
+                      status = "primary", width = "300px", size = "sm",
+
+                      awesomeCheckboxGroup(
+                        inputId = "FOPlotOptions",
+                        label = "Select Plots", 
+                        choices = c("Network", "Heatmap"),
+                        status = ""
+                      ),
+
+                      sliderInput("filtmin", label = "Number of breaks for histogram:",
+                          min = 0, max = 20, value = 6, step = 2
+                      ),
+
+                      br(),
+                      actionButton(inputId = "runFO", label = "Run", 
+                      style="color: #fff; background-color: #3E3F3A; border-color: #20201F"),
+
+
+                    ), 
+
+                    br(),
+                    textOutput("FO_error"),
+
+                    conditionalPanel(
+                      br(),
+                      condition = "$.inArray('Network', input.FOPlotOptions) > -1", 
+                      textOutput(""), 
+                      plotOutput(outputId = "GCdensityG", height = "500px",),
+                      br(),
+                    ),
+
+
+
+                  )
                    
                 ),
                  
