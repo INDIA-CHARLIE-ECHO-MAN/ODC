@@ -75,7 +75,7 @@ server <- function(input, output, session) {
     if (input$gene_list_selection == "Generate Gene List") {
       validate(
         need(input$chooseChrome, 'Please enter a Chromosme between 1-22, X, Y'),
-        need(input$chooseGeneNo != "" && input$chooseGeneNo > 0, 'Please enter a valid Gene Number'),
+        need(input$chooseGeneNo != "" && input$chooseGeneNo > 0, 'Please enter a valid Gene Number')
       )
       sample( EGAD::attr.human$name[EGAD::attr.human$chr==input$chooseChrome], input$chooseGeneNo )
     } else {
@@ -147,9 +147,9 @@ server <- function(input, output, session) {
     
     # network output
     output$network <- renderPlot(
-      {plot_network( sub_net$gene, clust_net$gene, medK )},
-      # width = 500,
-      # height = 500
+      {plot_network( sub_net$gene, clust_net$gene, medK )}, 
+      width = 500,
+      height = 500
     )
 
     output$CHtext = renderText({
@@ -285,6 +285,51 @@ server <- function(input, output, session) {
   )
 
   # FUNCTIONAL OUTLIERS!!! 
+  observeEvent(
+    {input$runFO}, 
+
+    { 
+
+      if (is.null(sn$sub_nets)) {
+        sn$sub_nets <- subset_network_hdf5_gene_list(gene_list(), tolower(input$network_type), dir="../networks/")
+      }
+
+      sub_net <- sn$sub_nets$sub_net
+      node_degrees <-  sn$sub_nets$node_degrees 
+      medK <-  as.numeric(sn$sub_nets$median)
+
+      clust_net = list() 
+      clust_net[["genes"]]  <- cluster_coexp(sub_net$genes, medK = medK, flag_plot = FALSE )
+
+      filt_min <- input$filtmin
+      clust_size <- plyr::count(clust_net$genes$clusters$labels )
+      clust_keep <-  clust_size[clust_size[,2] < filt_min ,1]
+      genes_keep <- !is.na(match( clust_net$genes$clusters$labels, clust_keep))
+
+
+      # Text Output 
+      output$FOnetworktext = renderText(
+        input$runFO, 
+        req(input$runFO),  #to prevent print at first lauch
+        isolate(print("Network of Functional Outliers"))
+      )
+
+      output$FOheatmaptext = renderText(
+        input$runFO, 
+        req(input$runFO), 
+        isolate(print("Heatmap of Functional Outliers"))
+      )
+      # Plot Output 
+      output$FOnetwork <- renderPlot(
+        { plot_network(1-sub_net$gene, clust_net$gene , 1 - medK) }, width = 500, height = 500
+      )
+
+      output$FOheatmap <- renderPlot(
+        { plot_coexpression_heatmap(sub_net$gene, clust_net$gene, filt=TRUE,) }, width = 500, height = 500
+      )
+
+    }
+  )
   
 
   #ERROR MESSAGES

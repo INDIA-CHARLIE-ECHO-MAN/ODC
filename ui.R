@@ -419,7 +419,7 @@ ui <- fluidPage(
                         status = ""
                       ),
 
-                      sliderInput("filtmin", label = "Number of breaks for histogram:",
+                      sliderInput("filtmin", label = "Number of Genes to form Module",
                           min = 0, max = 20, value = 6, step = 2
                       ),
 
@@ -436,12 +436,18 @@ ui <- fluidPage(
                     conditionalPanel(
                       br(),
                       condition = "$.inArray('Network', input.FOPlotOptions) > -1", 
-                      textOutput(""), 
-                      plotOutput(outputId = "FOnetworkG", height = "500px",),
+                      textOutput("FOnetworktext"), 
+                      plotOutput(outputId = "FOnetwork", height = "500px",),
                       br(),
                     ),
 
-
+                    conditionalPanel(
+                      br(),
+                      condition = "$.inArray('Heatmap', input.FOPlotOptions) > -1", 
+                      textOutput("FOheatmaptext"), 
+                      plotOutput(outputId = "FOheatmap", height = "500px",),
+                      br(),
+                    ),
 
                   )
                    
