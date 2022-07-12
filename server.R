@@ -8,7 +8,7 @@ server <- function(input, output, session) {
   #hide(id = "run")
   hide(id = "GC_dropdown")
   hide(id = "cluster_dropdown")
-
+  hide(id = "FO_dropdown")
 
   sn <- reactiveValues(sub_nets = NULL)
   observe({
@@ -95,6 +95,7 @@ server <- function(input, output, session) {
     show(id = "runFO")
     show(id = "GC_dropdown")
     show(id = "cluster_dropdown")
+    show(id = "FO_dropdown")
     hide(id = "GC_error")
     hide(id = "FO_error")
     hide(id = "cluster_error")

@@ -430,14 +430,14 @@ ui <- fluidPage(
 
                     ), 
 
-                    br(),
+                    # br(),
                     textOutput("FO_error"),
 
                     conditionalPanel(
                       br(),
                       condition = "$.inArray('Network', input.FOPlotOptions) > -1", 
                       textOutput(""), 
-                      plotOutput(outputId = "GCdensityG", height = "500px",),
+                      plotOutput(outputId = "FOnetworkG", height = "500px",),
                       br(),
                     ),
 
