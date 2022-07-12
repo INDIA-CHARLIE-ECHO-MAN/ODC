@@ -188,7 +188,6 @@ ui <- fluidPage(
                   selected = ""
                 ),
             
-
                 # upload gene list
                 conditionalPanel(
                   condition = "input.gene_list_selection == 'Upload Gene List'", 
