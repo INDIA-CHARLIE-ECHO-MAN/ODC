@@ -151,7 +151,18 @@ ui <- fluidPage(
                     selected = NULL,
                   ),
 
-                  fileInput("counts_file", label = "Upload counts"),
+                  # upload counts file
+                  fileInput("counts_file", 
+                            label = "Upload counts",
+                            accept = c(".csv", ".tsv", ".txt")
+                  ),
+
+                  radioButtons(
+                    inputId = 'sepRawButton', 
+                    label = 'Delimiter Selector', 
+                    choices = c(Default=''), 
+                    selected = ''
+                  ),
 
                   fileInput("labels_file", "Choose Labels File",
                     accept = c(
@@ -238,20 +249,21 @@ ui <- fluidPage(
                   selected = ""
                 ),
             
-
                 # upload gene list
                 conditionalPanel(
                   condition = "input.gene_list_selection == 'Upload Gene List'", 
+
                   # upload file
                   fileInput(
                     inputId = "DEFile", 
                     label = "Choose Gene List File",
                     accept = c(".csv", ".tsv", ".txt")
                   ),
+
                   # div(style = "margin-top: -25px"),
                   # button for selecting delimiter, default is nothing until file is selected and handled in server side
                   radioButtons(
-                    inputId = 'sepButton', 
+                    inputId = 'sepDEButton', 
                     label = 'Delimiter Selector', 
                     choices = c(Default=''), 
                     selected = ''

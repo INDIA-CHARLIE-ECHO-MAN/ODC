@@ -35,7 +35,7 @@ server <- function(input, output, session) {
     if (is.null(ext_labels_file)) {
       return ()
     }
-    read.table(file=server_labels_file$datapath, sep=input$sepButton, header=TRUE)
+    read.table(file=server_labels_file$datapath, sep=input$sepDEButton, header=TRUE)
     
   })
 
@@ -146,7 +146,7 @@ server <- function(input, output, session) {
           label = paste("Delimiter: Comma")
           choice <- (Comma=",")
         }
-        updateRadioButtons(session, "sepButton", label = label, choices = choice)
+        updateRadioButtons(session, "sepDEButton", label = label, choices = choice)
       }
     })
   
@@ -170,7 +170,7 @@ server <- function(input, output, session) {
       return ()
     }
 
-    read.table(file=ServerDEFile$datapath, sep=input$sepButton, header=TRUE, nrows=5)
+    read.table(file=ServerDEFile$datapath, sep=input$sepDEButton, header=TRUE, nrows=5)
   })
 
   # creates reactive table called DEFileContent
