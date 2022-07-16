@@ -53,7 +53,7 @@ server <- function(input, output, session) {
     tableOutput("DEFileContent")
   })
 
-  labelsData <- reactive({
+  LabelsData <- reactive({
     # Labels File from fileInput() function
     server_labels_file <- input$labels_file
 
@@ -153,8 +153,8 @@ server <- function(input, output, session) {
 #    data <- e[[name]]
 #  })
   ##################### RUN DE UPLOAD LABELS DATA ###########################
-  # Make labelsData
-  labelsData <- reactive({
+  # Make LabelsData
+  LabelsData <- reactive({
     ServerLabelsFile <- input$labels_file
     extLabelsFile <- tools::file_ext(ServerLabelsFile$datapath)
     req(ServerLabelsFile)
@@ -167,7 +167,7 @@ server <- function(input, output, session) {
 
   # creates reactive table called labelsFileContent
   output$labelsFileContent <- renderDataTable(
-    labelsData()
+    LabelsData()
   )
 
   # Output labels file
@@ -205,12 +205,12 @@ server <- function(input, output, session) {
       show(id = "select_case")
 
       show(id = "run_DE")
-      options <- names(labelsData())
+      options <- names(LabelsData())
       updateSelectInput(session, inputId="select_column","Select column to group", choices = options[2:length(options)], selected = NULL)
       })
 
   observeEvent(input$select_column, {
-      var <- labelsData()[[input$select_column]]
+      var <- LabelsData()[[input$select_column]]
       lvl <- levels(as.factor(var))
       updateSelectInput(session, inputId="select_case", "Select case to analyse", choices = lvl, selected = NULL)
 
@@ -252,10 +252,10 @@ server <- function(input, output, session) {
 
   # Run DE
   observeEvent(input$run_DE, {
-    labels <- labelsData()
+    labels <- LabelsData()
     counts_data <- countsData()
   
-    # var <- labelsData()[[input$select_column]]
+    # var <- LabelsData()[[input$select_column]]
 
     var <- input$select_column
     case <- input$select_case
