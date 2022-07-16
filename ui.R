@@ -171,7 +171,7 @@ ui <- fluidPage(
                   ),
 
                   radioButtons(
-                    inputId = 'sepLabelButton', 
+                    inputId = 'sepLabelsButton', 
                     label = 'Delimiter Selector', 
                     choices = c(Default=''), 
                     selected = ''
@@ -189,7 +189,7 @@ ui <- fluidPage(
                   tabsetPanel(
                     tabPanel(
                       title="Counts File",
-                      uiOutput("UIRawContent")
+                      uiOutput("UICountsContent")
                     ),
                     tabPanel(
                       title="Labels File",

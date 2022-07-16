@@ -37,7 +37,7 @@ server <- function(input, output, session) {
       return ()
     }
 
-    read.table(file=ServerDEFile$datapath, sep=input$septxtButton, header=TRUE, nrows=5)
+    read.table(file=ServerDEFile$datapath, sep=input$sepDEButton, header=TRUE, nrows=5)
   })
 
   # creates reactive table called DEFileContent
@@ -90,20 +90,20 @@ server <- function(input, output, session) {
           label = paste("Delimiter: Comma")
           choice <- (Comma=",")
         }
-        updateRadioButtons(session, "septxtButton", label = label, choices = choice)
+        updateRadioButtons(session, "sepDEButton", label = label, choices = choice)
       }
     })
   ########################### RUN DE UPLOAD COUNTS DATA #######################
   # Make countsData
   countsData <- reactive({
     ServerCountsFile <- input$counts_file
-    extDEFile <- tools::file_ext(ServerDEFile$datapath)
-    req(ServerDEFile)
+    extDEFile <- tools::file_ext(ServerCountsFile$datapath)
+    req(ServerCountsFile)
     validate(need(extDEFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
     if (is.null(extDEFile)) {
       return ()
     }
-    read.table(file=ServerDEFile$datapath, sep=input$septxtButton, header=TRUE, nrows=5)
+    read.table(file=ServerCountsFile$datapath, sep=input$sepCountsButton, header=TRUE, nrows=5)
   })
   
   # creates reactive table called CountsFileContent
@@ -115,7 +115,7 @@ server <- function(input, output, session) {
   })
 
   # handles rendering of reactive object on tb on ui
-  output$UIRawContent <- renderUI({
+  output$UICountsContent <- renderUI({
     tableOutput("CountsFileContent")
   })
 
@@ -138,7 +138,7 @@ server <- function(input, output, session) {
         label = paste("Delimiter: Comma")
         choice <- (Comma=",")
       }
-      updateRadioButtons(session, "septxtButton", label = label, choices = choice)
+      updateRadioButtons(session, "sepCountsButton", label = label, choices = choice)
       }
     })
 
@@ -153,36 +153,6 @@ server <- function(input, output, session) {
 #    data <- e[[name]]
 #  })
   ##################### RUN DE UPLOAD LABELS DATA ###########################
-
-  # Plot the data
-  observeEvent(input$labels_file, {
-      show(id = "select_column")
-      show(id = "select_case")
-
-      show(id = "run_DE")
-      options <- names(labelsData())
-      updateSelectInput(session, inputId="select_column","Select column to group", choices = options[2:length(options)], selected = NULL)
-      })
-
-  observeEvent(input$select_column, {
-      var <- labelsData()[[input$select_column]]
-      lvl <- levels(as.factor(var))
-      updateSelectInput(session, inputId="select_case", "Select case to analyse", choices = lvl, selected = NULL)
-
-  })
-
-  # creates reactive table called labelsFileContent
-  output$labelsFileContent <- renderTable({
-    if (is.null(labelsData())) {
-      return ()
-    }
-  })
-
-  # Output labels file
-  output$UILabelsContent <- renderUI({
-    tableOutput("labelsFileContent")
-  })
-
   observe({
     # labels_file from fileInput() function
     ServerLabelsFile <- req(input$labels_file)
@@ -202,11 +172,40 @@ server <- function(input, output, session) {
         label = paste("Delimiter: Comma")
         choice <- (Comma=",")
       }
-      updateRadioButtons(session, "sepLabelButton", label = label, choices = choice)
+      updateRadioButtons(session, "sepLabelsButton", label = label, choices = choice)
       }
     })
 
+  # creates reactive table called labelsFileContent
+  output$labelsFileContent <- renderTable({
+    if (is.null(labelsData())) {
+      return ()
+    }
+  })
+
+  # Output labels file
+  output$UILabelsContent <- renderUI({
+    tableOutput("labelsFileContent")
+  })
+
   ###################################################################
+
+  # Plot the data
+  observeEvent(input$labels_file, {
+      show(id = "select_column")
+      show(id = "select_case")
+
+      show(id = "run_DE")
+      options <- names(labelsData())
+      updateSelectInput(session, inputId="select_column","Select column to group", choices = options[2:length(options)], selected = NULL)
+      })
+
+  observeEvent(input$select_column, {
+      var <- labelsData()[[input$select_column]]
+      lvl <- levels(as.factor(var))
+      updateSelectInput(session, inputId="select_case", "Select case to analyse", choices = lvl, selected = NULL)
+
+  })
 
   # reactive converts the upload file into a reactive expression known as data
   LabelData <- reactive({
@@ -226,7 +225,7 @@ server <- function(input, output, session) {
       return ()
     }
 
-    read.table(file=ServerLabelFile$datapath, sep=input$septxtButton, header=TRUE, nrows=5)
+    read.table(file=ServerLabelFile$datapath, sep=input$sepButton, header=TRUE, nrows=5)
   })
 
   # creates reactive table called LabelFileContent
