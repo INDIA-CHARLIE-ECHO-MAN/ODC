@@ -176,9 +176,20 @@ server <- function(input, output, session) {
     read.table(file=ServerLabelsFile$datapath, sep=input$sepLabelsButton, header=TRUE)
   })
 
+  LabelsDataTable <- reactive({
+    ServerLabelsFile <- input$labels_file
+    extLabelsFile <- tools::file_ext(ServerLabelsFile$datapath)
+    req(ServerLabelsFile)
+    validate(need(extLabelsFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
+    if (is.null(extLabelsFile)) {
+      return ()
+    }
+    read.table(file=ServerLabelsFile$datapath, sep=input$sepLabelsButton, header=TRUE, nrows=5)
+  })
+
   # creates reactive table called labelsFileContent
   output$labelsFileContent <- renderDataTable(
-    LabelsData()
+    LabelsDataTable()
   )
 
   # Output labels file
