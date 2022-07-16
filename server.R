@@ -103,7 +103,7 @@ server <- function(input, output, session) {
     if (is.null(extCountsFile)) {
       return ()
     }
-    read.table(file=ServerCountsFile$datapath, sep=input$sepCountsButton, header=TRUE, nrows=5)
+    read.table(file=ServerCountsFile$datapath, sep=input$sepCountsButton, header=TRUE)
   })
   
   # creates reactive table called CountsFileContent
@@ -162,7 +162,7 @@ server <- function(input, output, session) {
     if (is.null(extLabelsFile)) {
       return ()
     }
-    read.table(file=ServerLabelsFile$datapath, sep=input$sepLabelsButton, header=TRUE, nrows=5)
+    read.table(file=ServerLabelsFile$datapath, sep=input$sepLabelsButton, header=TRUE)
   })
 
   # creates reactive table called labelsFileContent

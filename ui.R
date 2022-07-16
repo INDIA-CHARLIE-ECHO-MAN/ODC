@@ -179,7 +179,6 @@ ui <- fluidPage(
                 ), 
                ),
 
-
                br(),
                navlistPanel(
                 widths = c(3, 9), well = FALSE,
