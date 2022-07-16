@@ -29,8 +29,8 @@ server <- function(input, output, session) {
 
     # file format checking
     req(server_labels_file)
-     validate(need(ext_labels_file == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
-
+    validate(need(ext_labels_file == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
+  
     # convert data into file format
     if (is.null(ext_labels_file)) {
       return ()
@@ -50,10 +50,7 @@ server <- function(input, output, session) {
       show(id = "run_DE")
       options <- names(labelsData())
       updateSelectInput(session, inputId="select_column","Select column to group", choices = options[2:length(options)], selected = NULL)
-      
-      }
-       
-  )
+      })
 
   observeEvent(input$select_column, {
       var <- labelsData()[[input$select_column]]
@@ -150,8 +147,64 @@ server <- function(input, output, session) {
       }
     })
   
+  observe({
+    # counts_file from fileInput() function
+    ServerCountsFile <- req(input$counts_file)
+    
+    # extensions tool for format validation
+    extCountsFile <- tools::file_ext(ServerCountsFile$datapath)
+    if (is.null(input$counts_file)) {
+      return ()
+    } else{
+      if (extCountsFile == "txt") {
+        label = paste("Delimiters for", extCountsFile, "file")
+        choice <-c(Comma=",", Semicolon=";", Tab="\t", Space=" ")
+      } else if (extCountsFile == "tsv") {
+        label = paste("Delimiter: Tab")
+        choice <- (Tab="\t")
+      } else {
+        label = paste("Delimiter: Comma")
+        choice <- (Comma=",")
+      }
+      updateRadioButtons(session, "sepRawButton", label = label, choices = choice)
+      }
+    })
 
+  # make table to output counts_data
+  # reactive converts the upload file into a reactive expression known as data
+  RawData <- reactive({
 
+    # RawFile from fileInput() function
+    ServerRawFile <- input$counts_file
+
+    # extensions tool for format validation
+    extDEFile <- tools::file_ext(ServerRawFile$datapath)
+
+    # file format checking
+    req(ServerRawFile)
+     validate(need(extDEFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
+
+    # convert data into file format
+    if (is.null(extDEFile)) {
+      return ()
+    }
+
+    read.table(file=ServerRawFile$datapath, sep=input$sepRawButton, header=TRUE, nrows=5)
+  })
+
+  # creates reactive table called RawFileContent
+  output$RawFileContent <- renderTable({
+    if (is.null(RawData())) {
+      return ()
+    }
+    RawData()
+  })
+
+  # handles rendering of reactive object on tb on ui
+  output$UIRawContent <- renderUI({
+    tableOutput("RawFileContent")
+  })
+ 
   # reactive converts the upload file into a reactive expression known as data
   DEData <- reactive({
 

@@ -164,14 +164,11 @@ ui <- fluidPage(
                     selected = ''
                   ),
 
-                  fileInput("labels_file", "Choose Labels File",
-                    accept = c(
-                    "text/csv",
-                    "text/comma-separated-values,text/plain",
-                    ".csv")
+                  fileInput(
+                    inputId = "labels_file",
+                    label = "Choose Labels File",
+                    accept = c(".csv", ".tsv", ".txt")
                   ),
-
-                
                 ), 
                ),
 
@@ -181,7 +178,13 @@ ui <- fluidPage(
                 widths = c(3, 9), well = FALSE,
                 tabPanel(
                   title="View File",
-                  uiOutput("UILabelsContent"),
+
+                  tabsetPanel(
+                    tabPanel(
+                      title="File",
+                      uiOutput("UIRawContent")
+                    )
+                  )
                  ),
                 tabPanel(
                   title="Plot DE",
