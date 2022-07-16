@@ -97,10 +97,10 @@ server <- function(input, output, session) {
   # Make countsData
   countsData <- reactive({
     ServerCountsFile <- input$counts_file
-    extDEFile <- tools::file_ext(ServerCountsFile$datapath)
+    extCountsFile <- tools::file_ext(ServerCountsFile$datapath)
     req(ServerCountsFile)
-    validate(need(extDEFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
-    if (is.null(extDEFile)) {
+    validate(need(extCountsFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
+    if (is.null(extCountsFile)) {
       return ()
     }
     read.table(file=ServerCountsFile$datapath, sep=input$sepCountsButton, header=TRUE, nrows=5)
@@ -153,6 +153,28 @@ server <- function(input, output, session) {
 #    data <- e[[name]]
 #  })
   ##################### RUN DE UPLOAD LABELS DATA ###########################
+  # Make labelsData
+  labelsData <- reactive({
+    ServerLabelsFile <- input$labels_file
+    extLabelsFile <- tools::file_ext(ServerLabelsFile$datapath)
+    req(ServerLabelsFile)
+    validate(need(extLabelsFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
+    if (is.null(extLabelsFile)) {
+      return ()
+    }
+    read.table(file=ServerLabelsFile$datapath, sep=input$sepLabelsButton, header=TRUE, nrows=5)
+  })
+
+  # creates reactive table called labelsFileContent
+  output$labelsFileContent <- renderDataTable(
+    labelsData()
+  )
+
+  # Output labels file
+  output$UILabelsContent <- renderUI({
+    tableOutput("labelsFileContent")
+  })
+
   observe({
     # labels_file from fileInput() function
     ServerLabelsFile <- req(input$labels_file)
@@ -175,19 +197,6 @@ server <- function(input, output, session) {
       updateRadioButtons(session, "sepLabelsButton", label = label, choices = choice)
       }
     })
-
-  # creates reactive table called labelsFileContent
-  output$labelsFileContent <- renderTable({
-    if (is.null(labelsData())) {
-      return ()
-    }
-  })
-
-  # Output labels file
-  output$UILabelsContent <- renderUI({
-    tableOutput("labelsFileContent")
-  })
-
   ###################################################################
 
   # Plot the data
@@ -304,8 +313,6 @@ server <- function(input, output, session) {
     }
   )
 
-
-
   sn <- reactiveValues(sub_nets = NULL)
   # sub_nets
   sn <- reactiveValues(
@@ -331,7 +338,6 @@ server <- function(input, output, session) {
     }
   )
 
-
   # clust_net
   clust_net <- reactive({
     sub_net <- sn$sub_nets$sub_net
@@ -344,20 +350,11 @@ server <- function(input, output, session) {
 
   })
   
-  
   # Output of subnetowrk table
   observeEvent(
     input$generate_subnet, 
     {output$subnetwork <- renderTable(sn$sub_nets)}
   )
-  
-  
-
-
-
-
-
-
 
   # CLUSTER GENES
 
