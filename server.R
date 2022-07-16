@@ -94,7 +94,7 @@ server <- function(input, output, session) {
       }
     })
   ########################### RUN DE UPLOAD COUNTS DATA #######################
-  # Make countsData
+  # Make countsData for running DE
   countsData <- reactive({
     ServerCountsFile <- input$counts_file
     extCountsFile <- tools::file_ext(ServerCountsFile$datapath)
@@ -105,13 +105,24 @@ server <- function(input, output, session) {
     }
     read.table(file=ServerCountsFile$datapath, sep=input$sepCountsButton, header=TRUE)
   })
-  
-  # creates reactive table called CountsFileContent
-  output$CountsFileContent <- renderTable({
-    if (is.null(countsData())) {
+
+  countsDataTable <- reactive({
+    ServerCountsFile <- input$counts_file
+    extCountsFile <- tools::file_ext(ServerCountsFile$datapath)
+    req(ServerCountsFile)
+    validate(need(extCountsFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
+    if (is.null(extCountsFile)) {
       return ()
     }
-    countsData()
+    read.table(file=ServerCountsFile$datapath, sep=input$sepCountsButton, header=TRUE, nrows=5)
+  })  
+
+  # creates reactive table called CountsFileContent
+  output$CountsFileContent <- renderTable({
+    if (is.null(countsDataTable())) {
+      return ()
+    }
+    countsDataTable()
   })
 
   # handles rendering of reactive object on tb on ui
