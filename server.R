@@ -17,8 +17,41 @@ server <- function(input, output, session) {
   #hide(id = "select_case")  
 
   #hide(id ="run_DE")
-
   
+  #################### Assess DE upload DE data ###################
+  # reactive converts the upload file into a reactive expression known as data
+  DEData <- reactive({
+
+    # DEFile from fileInput() function
+    ServerDEFile <- input$DEFile
+
+    # extensions tool for format validation
+    extDEFile <- tools::file_ext(ServerDEFile$datapath)
+
+    # file format checking
+    req(ServerDEFile)
+    validate(need(extDEFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
+
+    # convert data into file format
+    if (is.null(extDEFile)) {
+      return ()
+    }
+
+    read.table(file=ServerDEFile$datapath, sep=input$septxtButton, header=TRUE, nrows=5)
+  })
+
+  # creates reactive table called DEFileContent
+  output$DEFileContent <- renderTable({
+    if (is.null(DEData())) {
+      return ()
+    }
+    DEData()
+  })
+
+  # handles rendering of reactive object on tb on ui
+  output$UIDEContent <- renderUI({
+    tableOutput("DEFileContent")
+  })
 
   labelsData <- reactive({
     # Labels File from fileInput() function
@@ -36,13 +69,92 @@ server <- function(input, output, session) {
       return ()
     }
     read.table(file=server_labels_file$datapath, sep=input$sepDEButton, header=TRUE)
-    
   })
 
+  observe({
+      # DEFile from fileInput() function
+      ServerDEFile <- req(input$DEFile)
+      
+      # extensions tool for format validation
+      extDEFile <- tools::file_ext(ServerDEFile$datapath)
+      if (is.null(input$DEFile)) {
+        return ()
+      } else{
+        if (extDEFile == "txt") {
+          label = paste("Delimiters for", extDEFile, "file")
+          choice <-c(Comma=",", Semicolon=";", Tab="\t", Space=" ")
+        } else if (extDEFile == "tsv") {
+          label = paste("Delimiter: Tab")
+          choice <- (Tab="\t")
+        } else {
+          label = paste("Delimiter: Comma")
+          choice <- (Comma=",")
+        }
+        updateRadioButtons(session, "septxtButton", label = label, choices = choice)
+      }
+    })
+  ########################### RUN DE UPLOAD COUNTS DATA #######################
+  # Make countsData
+  countsData <- reactive({
+    ServerCountsFile <- input$counts_file
+    extDEFile <- tools::file_ext(ServerDEFile$datapath)
+    req(ServerDEFile)
+    validate(need(extDEFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
+    if (is.null(extDEFile)) {
+      return ()
+    }
+    read.table(file=ServerDEFile$datapath, sep=input$septxtButton, header=TRUE, nrows=5)
+  })
   
-  
-    # Plot the data
-  
+  # creates reactive table called CountsFileContent
+  output$CountsFileContent <- renderTable({
+    if (is.null(countsData())) {
+      return ()
+    }
+    countsData()
+  })
+
+  # handles rendering of reactive object on tb on ui
+  output$UIRawContent <- renderUI({
+    tableOutput("CountsFileContent")
+  })
+
+  observe({
+    # counts_file from fileInput() function
+    ServerCountsFile <- req(input$counts_file)
+    
+    # extensions tool for format validation
+    extCountsFile <- tools::file_ext(ServerCountsFile$datapath)
+    if (is.null(input$counts_file)) {
+      return ()
+    } else{
+      if (extCountsFile == "txt") {
+        label = paste("Delimiters for", extCountsFile, "file")
+        choice <-c(Comma=",", Semicolon=";", Tab="\t", Space=" ")
+      } else if (extCountsFile == "tsv") {
+        label = paste("Delimiter: Tab")
+        choice <- (Tab="\t")
+      } else {
+        label = paste("Delimiter: Comma")
+        choice <- (Comma=",")
+      }
+      updateRadioButtons(session, "septxtButton", label = label, choices = choice)
+      }
+    })
+
+  # Jaz's countsData
+#  countsData <- reactive({
+#    if ( is.null(input$counts_file)) return(NULL)
+#    inFile <- input$counts_file
+#    file <- inFile$datapath
+    # load the file into new environment and get it from there
+#    e = new.env()
+#    name <- load(file, envir = e)
+#    data <- e[[name]]
+#  })
+  ##################### RUN DE UPLOAD LABELS DATA ###########################
+
+  # Plot the data
   observeEvent(input$labels_file, {
       show(id = "select_column")
       show(id = "select_case")
@@ -70,18 +182,65 @@ server <- function(input, output, session) {
   output$UILabelsContent <- renderUI({
     tableOutput("labelsFileContent")
   })
-  
 
+  observe({
+    # labels_file from fileInput() function
+    ServerLabelsFile <- req(input$labels_file)
+    
+    # extensions tool for format validation
+    extLabelsFile <- tools::file_ext(ServerLabelsFile$datapath)
+    if (is.null(input$labels_file)) {
+      return ()
+    } else{
+      if (extLabelsFile == "txt") {
+        label = paste("Delimiters for", extLabelsFile, "file")
+        choice <-c(Comma=",", Semicolon=";", Tab="\t", Space=" ")
+      } else if (extLabelsFile == "tsv") {
+        label = paste("Delimiter: Tab")
+        choice <- (Tab="\t")
+      } else {
+        label = paste("Delimiter: Comma")
+        choice <- (Comma=",")
+      }
+      updateRadioButtons(session, "sepLabelButton", label = label, choices = choice)
+      }
+    })
 
-  countsData <- reactive({
-    if ( is.null(input$counts_file)) return(NULL)
-    inFile <- input$counts_file
-    file <- inFile$datapath
-    # load the file into new environment and get it from there
-    e = new.env()
-    name <- load(file, envir = e)
-    data <- e[[name]]
+  ###################################################################
+
+  # reactive converts the upload file into a reactive expression known as data
+  LabelData <- reactive({
+
+    # RawFile from fileInput() function
+    ServerLabelFile <- input$labels_file
+
+    # extensions tool for format validation
+    extLabelFile <- tools::file_ext(ServerLabelFile$datapath)
+
+    # file format checking
+    req(ServerLabelFile)
+     validate(need(extLabelFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
+
+    # convert data into file format
+    if (is.null(extLabelFile)) {
+      return ()
+    }
+
+    read.table(file=ServerLabelFile$datapath, sep=input$septxtButton, header=TRUE, nrows=5)
   })
+
+  # creates reactive table called LabelFileContent
+  output$LabelFileContent <- renderTable({
+    if (is.null(LabelData())) {
+      return ()
+    }
+    LabelData()
+  })
+
+  # handles rendering DT table of labels file
+  output$UILabelContent <- renderDataTable(
+    LabelData()    
+  )
 
   # Run DE
   observeEvent(input$run_DE, {
@@ -123,121 +282,6 @@ server <- function(input, output, session) {
     )
     }
   )
-
-  observe({
-      # DEFile from fileInput() function
-      ServerDEFile <- req(input$DEFile)
-      
-      # extensions tool for format validation
-      extDEFile <- tools::file_ext(ServerDEFile$datapath)
-      if (is.null(input$DEFile)) {
-        return ()
-      } else{
-        if (extDEFile == "txt") {
-          label = paste("Delimiters for", extDEFile, "file")
-          choice <-c(Comma=",", Semicolon=";", Tab="\t", Space=" ")
-        } else if (extDEFile == "tsv") {
-          label = paste("Delimiter: Tab")
-          choice <- (Tab="\t")
-        } else {
-          label = paste("Delimiter: Comma")
-          choice <- (Comma=",")
-        }
-        updateRadioButtons(session, "sepDEButton", label = label, choices = choice)
-      }
-    })
-  
-  observe({
-    # counts_file from fileInput() function
-    ServerCountsFile <- req(input$counts_file)
-    
-    # extensions tool for format validation
-    extCountsFile <- tools::file_ext(ServerCountsFile$datapath)
-    if (is.null(input$counts_file)) {
-      return ()
-    } else{
-      if (extCountsFile == "txt") {
-        label = paste("Delimiters for", extCountsFile, "file")
-        choice <-c(Comma=",", Semicolon=";", Tab="\t", Space=" ")
-      } else if (extCountsFile == "tsv") {
-        label = paste("Delimiter: Tab")
-        choice <- (Tab="\t")
-      } else {
-        label = paste("Delimiter: Comma")
-        choice <- (Comma=",")
-      }
-      updateRadioButtons(session, "sepRawButton", label = label, choices = choice)
-      }
-    })
-
-  # make table to output counts_data
-  # reactive converts the upload file into a reactive expression known as data
-  RawData <- reactive({
-
-    # RawFile from fileInput() function
-    ServerRawFile <- input$counts_file
-
-    # extensions tool for format validation
-    extDEFile <- tools::file_ext(ServerRawFile$datapath)
-
-    # file format checking
-    req(ServerRawFile)
-     validate(need(extDEFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
-
-    # convert data into file format
-    if (is.null(extDEFile)) {
-      return ()
-    }
-
-    read.table(file=ServerRawFile$datapath, sep=input$sepRawButton, header=TRUE, nrows=5)
-  })
-
-  # creates reactive table called RawFileContent
-  output$RawFileContent <- renderTable({
-    if (is.null(RawData())) {
-      return ()
-    }
-    RawData()
-  })
-
-  # handles rendering of reactive object on tb on ui
-  output$UIRawContent <- renderUI({
-    tableOutput("RawFileContent")
-  })
- 
-  # reactive converts the upload file into a reactive expression known as data
-  DEData <- reactive({
-
-    # DEFile from fileInput() function
-    ServerDEFile <- input$DEFile
-
-    # extensions tool for format validation
-    extDEFile <- tools::file_ext(ServerDEFile$datapath)
-
-    # file format checking
-    req(ServerDEFile)
-     validate(need(extDEFile == c("csv", "tsv", "txt"), "Please upload a csv, tsv or txt file."))
-
-    # convert data into file format
-    if (is.null(extDEFile)) {
-      return ()
-    }
-
-    read.table(file=ServerDEFile$datapath, sep=input$sepDEButton, header=TRUE, nrows=5)
-  })
-
-  # creates reactive table called DEFileContent
-  output$DEFileContent <- renderTable({
-    if (is.null(DEData())) {
-      return ()
-    }
-    DEData()
-  })
-
-  # handles rendering of reactive object on tb on ui
-  output$UIDEContent <- renderUI({
-    tableOutput("DEFileContent")
-  })
 
   # Add the Run buttons 
   observeEvent(

@@ -158,7 +158,7 @@ ui <- fluidPage(
                   ),
 
                   radioButtons(
-                    inputId = 'sepRawButton', 
+                    inputId = 'sepCountsButton', 
                     label = 'Delimiter Selector', 
                     choices = c(Default=''), 
                     selected = ''
@@ -169,6 +169,13 @@ ui <- fluidPage(
                     label = "Choose Labels File",
                     accept = c(".csv", ".tsv", ".txt")
                   ),
+
+                  radioButtons(
+                    inputId = 'sepLabelButton', 
+                    label = 'Delimiter Selector', 
+                    choices = c(Default=''), 
+                    selected = ''
+                  )
                 ), 
                ),
 
@@ -181,10 +188,16 @@ ui <- fluidPage(
 
                   tabsetPanel(
                     tabPanel(
-                      title="File",
+                      title="Counts File",
                       uiOutput("UIRawContent")
+                    ),
+                    tabPanel(
+                      title="Labels File",
+                      dataTableOutput("UILabelContent")
                     )
                   )
+
+
                  ),
                 tabPanel(
                   title="Plot DE",
