@@ -184,7 +184,9 @@ server <- function(input, output, session) {
     if (is.null(extLabelsFile)) {
       return ()
     }
-    read.table(file=ServerLabelsFile$datapath, sep=input$sepLabelsButton, header=TRUE, nrows=5)
+    #read.table(file=ServerLabelsFile$datapath, sep=input$sepLabelsButton, header=TRUE, nrows=5)
+    finalTable <- fread(input = input$labels_file)
+    return(finalTable)
   })
 
   # creates reactive table called labelsFileContent
