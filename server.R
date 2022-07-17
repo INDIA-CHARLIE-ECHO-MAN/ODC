@@ -7,10 +7,7 @@ source("./src/calc_DE.R", local = TRUE)
 options(warn=-1)
 defaultW <- getOption("warn") 
 
-# sub_nets
-sn <- reactiveValues(
-  sub_nets = NULL,
-)
+
 server <- function(input, output, session) {
   # Removing elements that are not functional without subnetwork
   # hide(id = "runGC")
@@ -88,6 +85,7 @@ server <- function(input, output, session) {
 
 
   # __________________________________Run DE Plots___________________________________________
+
   de <- reactiveValues(
     deg_output = NULL, 
   )
@@ -105,14 +103,14 @@ server <- function(input, output, session) {
     # Format labels$var
     labels_var <- labels[[paste0(var)]]
 
-    #Initialise the variables of the chosen column to all be 1
+    # Initialise the variables of the chosen column to all be 1
     groups <- rep(1, length(labels_var))
     # Pick the case, relabel as 2
     groups[labels_var == case] = 2   
 
-    #Uncomment for Sex/Gender - doesn't work with status
-    #groups[labels$Family == 1] <- 0
-    #groups[labels$Relationship == "prb"] <- 0
+    # Uncomment for Sex/Gender - doesn't work with status
+    # groups[labels$Family == 1] <- 0
+    # groups[labels$Relationship == "prb"] <- 0
 
     filt = groups != 0 
     deg <- calc_DE(counts_data[,filt], groups[filt], input$DE_method) 
@@ -128,7 +126,7 @@ server <- function(input, output, session) {
             height = 450
     )
 
-    #MA Plot
+    # MA Plot
     output$DE_MA_text = renderText("MA Plot")
     output$DEplot_average <- renderPlot(
             {plot( log2(deg$degs$mean_cpm),  deg$degs$log2_fc,  
@@ -214,11 +212,14 @@ server <- function(input, output, session) {
 
 
 
-
+  # sub_nets
+  sn <- reactiveValues(
+    sub_nets = NULL,
+  )
 
   
 
-  # # generate sub_nets
+  # generate sub_nets
   
   gene_list <- reactive(
     if (input$gene_list_selection == "Generate Gene List") {
