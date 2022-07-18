@@ -337,6 +337,23 @@ server <- function(input, output, session) {
     updateTabsetPanel(session, inputId="navpage", selected="Assess DE")
     updateTabsetPanel(session, "subnetwork_file_tabset", selected = "Subnetwork")
     updateRadioButtons(session, inputId="gene_list_selection", choices=c("Upload Gene List", "Generate Gene List", "Use DE results"), selected = "Use DE results")
+    #Ensure user generates a subnetowrk
+    show(id = "CG_error")
+    show(id = "GC_error")
+    show(id = "FO_error")
+    hide(id = "GC_dropdown")
+    hide(id = "cluster_dropdown")
+    hide(id = "CG_dropdown")
+    hide(id = "FO_dropdown")
+    sn$sub_nets <- NULL
+
+    #Remove any existing data from checkboxes
+    updateAwesomeCheckboxGroup(session, inputId = "GCPlotOptions", choices = c("Density", "Histogram", "Clustered Density", "Clustered Histogram"),)
+    updateAwesomeCheckboxGroup(session, inputId = "FOPlotOptions", label = tags$h4("Select Plots"), choices = c("Network", "Heatmap"))
+    updateAwesomeCheckboxGroup(session,  inputId = "FO_table_options", label = tags$h4("Select Tables"), choices = c("Functional Outliers", "Genes in Module"))
+    updateAwesomeCheckboxGroup(session,  inputId = "FOPlotOptions", label = tags$h4("Select Plots"), choices = c("Network", "Heatmap"))
+    updateAwesomeCheckboxGroup(session, inputId="clusterPlotOptions", choices=c("Network", "Heatmap", "Binarized Heatmap"))
+
   })
 
   observe({
@@ -416,7 +433,6 @@ server <- function(input, output, session) {
 
     } else { 
       # subnetwork from Gene List 
-      updateAwesomeCheckboxGroup(session, inputId="clusterPlotOptions", choices=c("Network", "Heatmap", "Binarized Heatmap"))
       if (input$gene_list_selection == "Generate Gene List") {
 
         if (str_detect(input$chooseChrome, "chr[XY]") == FALSE && str_detect(input$chooseChrome, "chr[0-9]") == FALSE) {

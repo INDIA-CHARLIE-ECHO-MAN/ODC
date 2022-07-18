@@ -387,7 +387,7 @@ ui <- fluidPage(
                       awesomeCheckboxGroup(
                         inputId = "clusterPlotOptions",
                         label = tags$h4("Select Plots"), 
-                        choices = c("Network", "Heatmap", "Binarized Heatmap", "Upregulated Network", "Upregulated Heatmap", "Upregulated Binarized Heatmap", "Downregulated Network", "Downregulated Heatmap", "Downregulated Binarized Heatmap"),
+                        choices=c("Network", "Heatmap", "Binarized Heatmap"),
                         status = ""
                       ),
 
