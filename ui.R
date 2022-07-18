@@ -231,7 +231,7 @@ ui <- fluidPage(
                 tags$h4("Network Selection"),
                 selectInput(
                   inputId = "network_type",
-                  label=NULL,
+                  label = NULL,
                   choices = c("Blood", "Brain", "Generic"),
                   selected = "Generic"
                 ),
@@ -304,12 +304,14 @@ ui <- fluidPage(
                     # view subnetwork tab
                     tabPanel(
                       title="Subnetwork", 
+                      br(),
                       tableOutput("subnetwork")
                     ),
 
                     # view file tab
                     tabPanel(
                       title="File",
+                      br(),
                       uiOutput("UIDEContent")
                     ),
                   ),
@@ -336,7 +338,7 @@ ui <- fluidPage(
                       ),
 
                       # run button
-                      actionButton(inputId = "run", label = "Run",
+                      actionButton(inputId = "CG_run", label = "Run",
 
                       # dropdown characteristics
                       style="color: #fff; background-color: #3E3F3A; border-color: #20201F"),
@@ -385,7 +387,7 @@ ui <- fluidPage(
                         br(),
                         title="Tables",
                         br(),
-
+                        
                         # clustering genes
                         h4("Clustering Genes"), 
                         br(),
@@ -435,7 +437,7 @@ ui <- fluidPage(
                       br(),
 
                       # run button
-                      actionButton(inputId = "runGC", label = "Run", 
+                      actionButton(inputId = "GC_run", label = "Run", 
 
                       # dropdown characteristics
                       style="color: #fff; background-color: #3E3F3A; border-color: #20201F"),
@@ -529,7 +531,7 @@ ui <- fluidPage(
                       br(),
                       
                       # run button
-                      actionButton(inputId = "runFO", label = "Run", 
+                      actionButton(inputId = "FO_run", label = "Run", 
 
                       # dropdown characteristics
                       style="color: #fff; background-color: #3E3F3A; border-color: #20201F"),
@@ -606,9 +608,100 @@ ui <- fluidPage(
                 # GENE SET ENRICHMENT ANALYSIS
                 tabPanel(
                   title="Gene Set Enrichment Analysis",
-                  "GSE Page",
+                  mainPanel(
+                    h3("Gene Set Enrichment Analysis"),
+                    
+                    # options dropdown
+                    dropdown(
+                      inputId = "GSEA_dropdown",
+                      style = "minimal", icon = "OPTIONS",
+                      status = "primary", width = "300px", size = "sm",
+                      
+                      # select GSEA type
+                      radioButtons(
+                        inputId = "GSEA_type",
+                        label = tags$h4("GSEA Type"),
+                        choices = c("Standard GSEA", "AUCs GSEA"),
+                        selected = ""
+                      ),
+                      
+                      # standard GSEA options
+                      conditionalPanel(
+                        condition = "input.GSEA_type == 'Standard GSEA'", 
+                        awesomeCheckboxGroup(
+                          inputId = "GSEA_std_PlotOptions",
+                          label = tags$h4("Select Plots"), 
+                          choices = c("P-value Heatmap"),
+                          status = ""
+                        ),
+                        br(),
+                        # run button
+                        actionButton(
+                          inputId = "GSEA_std_run",
+                          label = "Run Standard GSEA",
+                          style="color: #fff; background-color: #3E3F3A; border-color: #20201F"
+                        ),
+                      ),
+
+                      # AUCs GSEA options
+                      conditionalPanel(
+                        condition = "input.GSEA_type == 'AUCs GSEA'", 
+                        awesomeCheckboxGroup(
+                          inputId = "GSEA_auc_PlotOptions",
+                          label = tags$h4("Select Plots"), 
+                          choices = c("P-value Heatmap", "AUROC Graph", "AUC Histogram", "Gene Set Size Histogram", "Scatter Plot (AUCs vs P-values)"),
+                          status = ""
+                        ),
+                        br(),
+                        # run button
+                        actionButton(
+                          inputId = "GSEA_auc_run",
+                          label = "Run AUCs GSEA",
+                          style="color: #fff; background-color: #3E3F3A; border-color: #20201F"
+                        ),
+
+                      ),
+                      
+                      # # filt_min slider
+                      # conditionalPanel(
+                      #   condition = "$.inArray('Histogram', input.GCPlotOptions) > -1 || $.inArray('Clustered Histogram', input.GCPlotOptions) > -1" ,
+                      #   sliderInput(
+                      #     "xybreaks", 
+                      #     label = "Number of breaks for histogram:",
+                      #     min = 10, max = 150, value = 100, step = 10,
+                      #   ),
+                      # ),
+                      
+                      br(),
+
+                    ),
+                    
+                    br(),
+
+                    # error message
+                    textOutput("GSEA_error"),
+                  ),
+                  br(),
+                  
+                  # heatmap
+                  conditionalPanel(
+                    condition = "$.inArray('P-value Heatmap', input.GSEA_std_PlotOptions) > -1", 
+                    h4("P-value Heatmap"), 
+                    plotOutput(outputId = "GSEA_std_heatmap", height = "500px"),
+                  ),
+
+                  # AUROC Graph
+                  conditionalPanel(
+                    condition = "$.inArray('AUROC Graph', input.GSEA_auc_PlotOptions) > -1", 
+                    h4("AUROC Graph"), 
+                    plotOutput(outputId = "GSEA_AUROC", height = "500px"),
+                    br(),
+                  ),
+                  
                 ),
-               ),
-             )
+
+              
+              ),
+            )
   )
 )

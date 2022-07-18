@@ -10,8 +10,8 @@ defaultW <- getOption("warn")
 
 server <- function(input, output, session) {
   # Removing elements that are not functional without subnetwork
-  # hide(id = "runGC")
-  # hide(id = "run")
+  # hide(id = "GC_run")
+  # hide(id = "CG_run")
   hide(id = "GC_dropdown")
   hide(id = "cluster_dropdown")
   hide(id = "CG_dropdown")
@@ -236,20 +236,22 @@ server <- function(input, output, session) {
         shinyalert(title = "Invalid Input", text = "Please enter a valid number of Genes", type = "error")
         NULL
       } else { 
-        sample( EGAD::attr.human$name[EGAD::attr.human$chr==input$chooseChrome], input$chooseGeneNo,)
-
+        sample( EGAD::attr.human$name[EGAD::attr.human$chr==input$chooseChrome], input$chooseGeneNo)
       }
     } else {
       read.delim(file = input$DEFile$datapath, header = FALSE, sep = "\n", dec = ".")[,1]
     }
   )
 
-  # generate subnetwork only when button is clicked
-  sub_nets <- eventReactive(input$generate_subnet, {
-    if (!is.null(gene_list())) { 
-      subset_network_hdf5_gene_list(gene_list(), tolower(input$network_type), dir="../networks/")
-    } 
-  })
+  # generate subnetwork only when button is clicked\
+  sub_nets <- eventReactive(
+    input$generate_subnet, 
+    {
+      if (!is.null(gene_list())) { 
+        sn$sub_nets <- subset_network_hdf5_gene_list(gene_list(), tolower(input$network_type), dir="../networks/")
+      } 
+    }
+  )
 
   # Add the Run buttons 
   observeEvent(
@@ -257,18 +259,23 @@ server <- function(input, output, session) {
     {
       # cluster genes
       show(id = "CG_dropdown")
-      show(id = "run")
+      show(id = "CG_run")
       hide(id = "CG_error")
 
       # gene connectivity
       show(id = "GC_dropdown")
-      show(id = "runGC")
+      show(id = "GC_run")
       hide(id = "GC_error")
 
       # functional outliers
       show(id = "FO_dropdown")
-      show(id = "runFO")
+      show(id = "FO_run")
       hide(id = "FO_error")
+
+      # GSEA
+      show(id = "GSEA_dropdown")
+      show(id = "GSEA_run")
+      hide(id = "GSEA_error")
 
     }
   )
@@ -310,8 +317,6 @@ server <- function(input, output, session) {
   observeEvent(
     {input$run},
     {
-      sn$sub_nets <- subset_network_hdf5_gene_list(gene_list(), tolower(input$network_type), dir="../networks/")
-
       sub_net <- sn$sub_nets$sub_net
       node_degrees <- sn$sub_nets$node_degrees
       medK <- as.numeric(sn$sub_nets$median)
@@ -359,12 +364,8 @@ server <- function(input, output, session) {
   ##################### GENE CONNECTIVITY #####################
 
   observeEvent(
-    {input$runGC},
+    {input$GC_run},
     {
-      if (is.null(sn$sub_nets)) {
-        sn$sub_nets <- subset_network_hdf5_gene_list(gene_list(), tolower(input$network_type), dir="../networks/")
-        
-      }
       sub_net <- sn$sub_nets$sub_net
       node_degrees <- sn$sub_nets$node_degrees  
       medK <- as.numeric(sn$sub_nets$median)
@@ -429,12 +430,8 @@ server <- function(input, output, session) {
   ##################### FUNCTIONAL OUTLIERS #####################
 
   observeEvent(
-    {input$runFO},
+    {input$FO_run},
     {
-      if (is.null(sn$sub_nets)) {
-        sn$sub_nets <- subset_network_hdf5_gene_list(gene_list(), tolower(input$network_type), dir="../networks/")
-        
-      }
       sub_net <- sn$sub_nets$sub_net
       node_degrees <- sn$sub_nets$node_degrees  
       medK <- as.numeric(sn$sub_nets$median)
@@ -480,7 +477,53 @@ server <- function(input, output, session) {
     }
   )
 
+  ##################### Standard GSEA #####################
 
+  observeEvent(
+    {input$GSEA_std_run},
+    {
+      data(go_slim)
+      data(go_voc)
+
+      filt <- colSums(go_slim) < 5000 & colSums(go_slim) >= 10
+      gene_list <- clust_net()$genes$clusters$genes[clust_net()$genes$order]
+      go_enrich <- gene_set_enrichment(gene_list, go_slim[filt,], go_voc) 
+      
+      # standard GSEA heatmap
+      output$GSEA_std_heatmap <- renderPlot(
+        {plot_gene_set_enrichment(go_enrich, gene_list, go_slim[filt,])},
+        width = 500,
+        height = 500
+      )
+    }
+  )
+
+  ##################### AUCs GSEA #####################
+  observeEvent(
+    {input$GSEA_auc_run},
+    {
+      data(go_slim)
+      
+      gene_rankings <- order(log10(deg$degs$pvals), abs(deg$degs$log2_fc)) 
+      names(gene_rankings) <- rownames(deg$degs)
+      gene_rankings_rev <- rank(max(gene_rankings) - gene_rankings) 
+      
+      m <- match(rownames(go_slim), names(gene_rankings_rev))
+      f.g = !is.na(m)
+      f.r = m[f.g]
+      gene_sets = go_slim[f.g,]
+      gene_rankings_rev = rank(gene_rankings_rev[f.r])
+
+      gene_set_aucs <- gene_set_enrichment_aucs(gene_sets, gene_rankings_rev) 
+
+      # 
+      output$GSEA_AUROC <- renderPlot(
+        {plot_gene_set_enrichment_ranked(gene_set_aucs, gene_rankings_rev, gene_list, go_slim)},
+        width = 500,
+        height = 500
+      )
+    }
+  )
 
 
   ##################### ERROR MESSAGES #####################
@@ -494,6 +537,10 @@ server <- function(input, output, session) {
   }) 
 
   output$FO_error <- renderText({
+    print("Please upload/generate a gene list in OPTIONS")
+  })
+
+  output$GSEA_error <- renderText({
     print("Please upload/generate a gene list in OPTIONS")
   }) 
 
