@@ -546,9 +546,7 @@ server <- function(input, output, session) {
 
 
   ##################### CLUSTER GENES #####################
-  eventReactive({
-    
-  })
+
   observeEvent(
     {input$run},
     {
