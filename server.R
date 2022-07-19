@@ -50,9 +50,10 @@ server <- function(input, output, session) {
 
 
 
+  
   ##########################################################################################
   #                                                                                        #
-  #                                       RUN DE                                           #
+  #                                    RUN DE                                              #
   #                                                                                        #
   ##########################################################################################
   
@@ -81,11 +82,11 @@ server <- function(input, output, session) {
      # counts_file from fileInput() function
     ServerCountsFile <- req(input$counts_file)
     
-  #   # extensions tool for format validation
+    # extensions tool for format validation
     extCountsFile <- tools::file_ext(ServerCountsFile$datapath)
     if (is.null(input$counts_file)) {
       return ()
-    } else{
+    } else {
       if (extCountsFile == "txt") {
         label = paste("Delimiters for", extCountsFile, "file")
         choice <-c(Comma=",", Semicolon=";", Tab="\t", Space=" ")
@@ -113,6 +114,7 @@ server <- function(input, output, session) {
     })
 
   ########################### UPLOAD LABELS DATA ###########################
+
   # Make labelsData
   labelsData <- reactive({
     ServerLabelsFile <- input$labels_file
@@ -226,8 +228,6 @@ server <- function(input, output, session) {
     input$UILabelContentRemoveSelection_rows_selected
   })
 
-  
-    
   # Switch to labels tab if labels file is uploaded
   observeEvent(input$labels_file, {
     updateTabsetPanel(session, "counts_labels_tabset", selected = "Labels File")
@@ -248,25 +248,6 @@ server <- function(input, output, session) {
     }
   })
   
-
-
-  countsData <- reactive({
-    if ( is.null(input$counts_file)) return(NULL)
-    inFile <- input$counts_file
-    file <- inFile$datapath
-    # load the file into new environment and get it from there
-    e = new.env()
-    name <- load(file, envir = e)
-    data <- e[[name]]
-  })
-
-
-  ##########################################################################################
-  #                                                                                        #
-  #                                        RUN DE                                          #
-  #                                                                                        #
-  ##########################################################################################
-
   de <- reactiveValues(
     deg_output = NULL, 
   )
@@ -314,7 +295,6 @@ server <- function(input, output, session) {
         for (d in cases_removed) {
           groups[d] = 0
         }
-
         # No cases have been selected
         print(groups)
         print(check)
@@ -329,11 +309,11 @@ server <- function(input, output, session) {
       }
       
       if (!is.null(deg)) {
-        show(id="vol")
 
         # Volcano Plot
+        show(id="vol")
         output$DEplot <- renderPlot(
-                {plot( deg$degs$log2_fc, -log10(deg$degs$pvals),  
+                {plot(deg$degs$log2_fc, -log10(deg$degs$pvals),  
                 pch=19, bty="n", 
                 xlab="log2 FC", ylab="-log10 p-vals" )},
                 width = 450,
@@ -342,7 +322,7 @@ server <- function(input, output, session) {
 
         # MA Plot
         show(id="MA")
-        # output$DE_MA_text = renderText("MA Plot")
+        #output$DE_MA_text = renderText("MA Plot")
         output$DEplot_average <- renderPlot(
                 {plot( log2(deg$degs$mean_cpm),  deg$degs$log2_fc,  
                 pch=19, bty="n", 
@@ -355,17 +335,12 @@ server <- function(input, output, session) {
     }
   )
 
-  # 
-  observeEvent(
-    input$assess_run_de, 
-    { 
-      updateTabsetPanel(session, inputId="navpage", selected="Assess DE")
-      updateTabsetPanel(session, "subnetwork_file_tabset", selected = "Subnetwork")
-      updateRadioButtons(session, inputId="gene_list_selection", choices=c("Upload Gene List", "Generate Gene List", "Use DE results"), selected = "Use DE results")
-    }
-  )
+  observeEvent(input$assess_run_de, { 
+    updateTabsetPanel(session, inputId="navpage", selected="Assess DE")
+    updateTabsetPanel(session, "subnetwork_file_tabset", selected = "Subnetwork")
+    updateRadioButtons(session, inputId="gene_list_selection", choices=c("Upload Gene List", "Generate Gene List", "Use DE results"), selected = "Use DE results")
+  })
 
-  # 
   observe({
       # DEFile from fileInput() function
       ServerDEFile <- req(input$DEFile)
@@ -374,7 +349,7 @@ server <- function(input, output, session) {
       extDEFile <- tools::file_ext(ServerDEFile$datapath)
       if (is.null(input$DEFile)) {
         return ()
-      } else {
+      } else{
         if (extDEFile == "txt") {
           label = paste("Delimiters for", extDEFile, "file")
           choice <-c(Comma=",", Semicolon=";", Tab="\t", Space=" ")
@@ -388,6 +363,7 @@ server <- function(input, output, session) {
         updateRadioButtons(session, "sepButton", label = label, choices = choice)
       }
     })
+  
   
   ##########################################################################################
   #                                                                                        #
@@ -443,12 +419,12 @@ server <- function(input, output, session) {
       # subnetwork from DE results 
       if (input$gene_list_selection == "Use DE results") { 
           sn$sub_nets <- subset_network_hdf5(de$deg_output$degs, tolower(input$network_type), dir="../networks/")
-          updateAwesomeCheckboxGroup(session, inputId="clusterPlotOptions", choices=c("Upregulated Network", "Upregulated Heatmap", "Upregulated Binarized Heatmap", "Downregulated Network", "Downregulated Heatmap", "Downregulated Binarized Heatmap"))
+          updateAwesomeCheckboxGroup(session, inputId="CG_PlotOptions", choices=c("Upregulated Network", "Upregulated Heatmap", "Upregulated Binarized Heatmap", "Downregulated Network", "Downregulated Heatmap", "Downregulated Binarized Heatmap"))
       } 
       
       # subnetwork from gene_list 
       else { 
-        updateAwesomeCheckboxGroup(session, inputId="clusterPlotOptions", choices=c("Network", "Heatmap", "Binarized Heatmap"))
+        updateAwesomeCheckboxGroup(session, inputId="CG_PlotOptions", choices=c("Network", "Heatmap", "Binarized Heatmap"))
         
         # generate gene_list
         if (input$gene_list_selection == "Generate Gene List") {

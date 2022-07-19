@@ -175,75 +175,80 @@ ui <- fluidPage(
                   ),
 
                 ), 
-               ),
+              ),
 
+              br(),
 
-               br(),
-               navlistPanel(
+              navlistPanel(
                 widths = c(3, 9), well = FALSE,
+
+                # VIEW FILES
                 tabPanel(
                   title="View File",
 
                   tabsetPanel(
                     id="counts_labels_tabset",
+                    # Counts File tab
                     tabPanel(
                       title="Counts File",
                       dataTableOutput("UICountsContent")
                     ),
+                    # Labels File tab
                     tabPanel(
                       title="Labels File",
                       dataTableOutput("UILabelContent")
                     ),
-                    
                   )
-                
+                ),
 
-                 ),
-
-                
+                # PLOT DE
                 tabPanel(
                   title="Plot DE",
                   h4("Plot Differential Expression"),
                   p(id = "runDE_error", "Please upload counts and labels data in OPTIONS"),
+                  
+                  
                   dropdown(
                     inputId = "DE_options",
                     # side panel characteristics
                     style = "minimal", icon = "ANALYSIS OPTIONS",
                     status = "primary", width = "600px", size = "sm",
 
-                  selectInput(
-                    inputId = "DE_method",
-                    label= tags$h5("Choose DE Method"),
-                    choices = c("wilcox", "DESeq2", "edgeR"),
-                    selected = NULL,
-                    width = "600px",
-                  ),
-                  
-                    
-                    radioButtons(
-                    inputId = "case_control_method",
-                    label = tags$h5("Case/Control Selection"),
-                    choices = c("Choose Case by Label", "Choose Case/Controls individually"),
-                    selected = ""
+                    # select DE method
+                    selectInput(
+                      inputId = "DE_method",
+                      label= tags$h5("Choose DE Method"),
+                      choices = c("wilcox", "DESeq2", "edgeR"),
+                      selected = NULL,
+                      width = "600px",
                     ),
-                   
+                    
+                    # select case control method
+                    radioButtons(
+                      inputId = "case_control_method",
+                      label = tags$h5("Case/Control Selection"),
+                      choices = c("Choose Case by Label", "Choose Case/Controls individually"),
+                      selected = ""
+                    ),
+
+                    # Choose Case by Label
                     conditionalPanel(condition = "input.case_control_method == 'Choose Case by Label'", 
                       selectInput(
                         inputId="select_column",
                         label= "Select label to group ",
-                        choices = NULL, #no choice before uploading
+                        choices = NULL, # no choice before uploading
                         width = "600px",
                       ),
                   
                       selectInput(
                         inputId="select_case",
                         label= "Select case to analyse",
-                        choices = NULL, #no choice before column selected
+                        choices = NULL, # no choice before column selected
                         width = "600px",
                       ),
-
                     ),
 
+                    # Choose Case/Controls individually
                     conditionalPanel(condition = "input.case_control_method == 'Choose Case/Controls individually'", 
                       h6(strong("Select Cases")),
                       dataTableOutput("UILabelContentSelection"),   
@@ -251,31 +256,34 @@ ui <- fluidPage(
                       dataTableOutput("UILabelContentRemoveSelection"),                   
                     ),
                     
+                    # run DE button
                     actionButton(inputId="run_DE", label = "Run DE"),
                   
                   ),
 
-                    splitLayout(cellWidths = c("50%", "50%"), 
+                  splitLayout(
+                    cellWidths = c("50%", "50%"), 
+
+                    # Volcano Plot
                     fluidPage(
                       #textOutput("DE_V_text"),
                       h4(id="vol"," Volcano Plot", style="text-align: center;"),
                       column(12, plotOutput(outputId = "DEplot", height = "450px"), align = "center"), 
-                      
                     ),
+
+                    # MA Plot
                     fluidPage(
                       #textOutput("DE_MA_text"),
                       h4(id="MA"," MA Plot", style="text-align: center;"),
                       column(12, plotOutput(outputId = "DEplot_average", height = "450px"), align = "center"),
-                      
                     )
-                          
-                    ), 
-                    actionButton(inputId="assess_run_de", label = "Assess DE Data"), 
+
+                  ), 
                   
-                  
+                  # assess DE button
+                  actionButton(inputId="assess_run_de", label = "Assess DE Data"), 
                  
-                 ),
-                 
+                ),
               ),
             ),
             
@@ -387,7 +395,7 @@ ui <- fluidPage(
 
                       # select plots
                       awesomeCheckboxGroup(
-                        inputId = "clusterPlotOptions",
+                        inputId = "CG_PlotOptions",
                         label = tags$h4("Select Plots"), 
                         choices = c("Network", "Heatmap", "Binarized Heatmap", "Upregulated Network", "Upregulated Heatmap", "Upregulated Binarized Heatmap", "Downregulated Network", "Downregulated Heatmap", "Downregulated Binarized Heatmap"),
                         status = ""
@@ -413,7 +421,7 @@ ui <- fluidPage(
 
                         # network
                         conditionalPanel(
-                          condition = "$.inArray('Network', input.clusterPlotOptions) > -1", 
+                          condition = "$.inArray('Network', input.CG_PlotOptions) > -1", 
                           h5(id="CG_network_text", "Network of Clustered Genes"), 
                           br(),
                           plotOutput(outputId = "network", height = "500px"),
@@ -421,7 +429,7 @@ ui <- fluidPage(
                         
                         # heatmap
                         conditionalPanel(
-                          condition = "$.inArray('Heatmap', input.clusterPlotOptions) > -1", 
+                          condition = "$.inArray('Heatmap', input.CG_PlotOptions) > -1", 
                           h5(id="CG_heatmap_text", "Heatmap of Clustered Genes"),
                           br(),
                           plotOutput(outputId = "heatmap", height = "500px"),
@@ -429,49 +437,49 @@ ui <- fluidPage(
 
                         # binarized heatmap
                         conditionalPanel(
-                          condition = "$.inArray('Binarized Heatmap', input.clusterPlotOptions) > -1", 
+                          condition = "$.inArray('Binarized Heatmap', input.CG_PlotOptions) > -1", 
                           h5(id="CG_bheatmap_text", "Binarized Heatmap of Clustered Genes"), 
                           br(),
                           plotOutput(outputId = "Bheatmap", height = "500px"), 
                         ),
 
                         conditionalPanel(
-                          condition = "$.inArray('Upregulated Network', input.clusterPlotOptions) > -1", 
+                          condition = "$.inArray('Upregulated Network', input.CG_PlotOptions) > -1", 
                           h4("Network of Clustered, Upregulated Genes"), 
                           br(), 
                           plotOutput(outputId = "upregNetwork", height = "500px"), 
                         ),
 
                         conditionalPanel(
-                          condition = "$.inArray('Upregulated Heatmap', input.clusterPlotOptions) > -1", 
+                          condition = "$.inArray('Upregulated Heatmap', input.CG_PlotOptions) > -1", 
                           h4("Heatmap of Clustered, Upregulated Genes"), 
                           br(), 
                           plotOutput(outputId = "upregHeatmap", height = "500px"),
                         ),
 
                         conditionalPanel(
-                          condition = "$.inArray('Upregulated Binarized Heatmap', input.clusterPlotOptions) > -1", 
+                          condition = "$.inArray('Upregulated Binarized Heatmap', input.CG_PlotOptions) > -1", 
                           h4("Binarized Hatmap of Clustered, Upregulated Genes"), 
                           br(),
                           plotOutput(outputId = "upregbinHeatmap", height = "500px"), 
                         ), 
 
                         conditionalPanel(
-                          condition = "$.inArray('Downregulated Network', input.clusterPlotOptions) > -1",
+                          condition = "$.inArray('Downregulated Network', input.CG_PlotOptions) > -1",
                           h4("Network of Clustered, Downregulated Genes"), 
                           br(), 
                           plotOutput(outputId = "downregNetwork", height = "500px"),
                         ), 
 
                         conditionalPanel(
-                          condition = "$.inArray('Downregulated Heatmap', input.clusterPlotOptions) > -1", 
+                          condition = "$.inArray('Downregulated Heatmap', input.CG_PlotOptions) > -1", 
                           h4("Heatmap of Clustered, Downregulated Genes"), 
                           br(), 
                           plotOutput(outputId = "downregHeatmap", height = "500px"),
                         ), 
 
                         conditionalPanel(
-                          condition = "$.inArray('Downregulated Binarized Heatmap', input.clusterPlotOptions) > -1", 
+                          condition = "$.inArray('Downregulated Binarized Heatmap', input.CG_PlotOptions) > -1", 
                           h4("Binarized Heatmap of Clustered, Downregulated Genes"), 
                           br(), 
                           plotOutput(outputId = "downregbinHeatmap", height = "500px"),    
@@ -515,7 +523,7 @@ ui <- fluidPage(
 
                       # select plots
                       awesomeCheckboxGroup(
-                        inputId = "GCPlotOptions",
+                        inputId = "GC_PlotOptions",
                         label = tags$h4("Select Plots"), 
                         choices = c("Density", "Histogram", "Clustered Density", "Clustered Histogram"),
                         status = ""
@@ -523,7 +531,7 @@ ui <- fluidPage(
                       
                       # filt_min slider
                       conditionalPanel(
-                        condition = "$.inArray('Histogram', input.GCPlotOptions) > -1 || $.inArray('Clustered Histogram', input.GCPlotOptions) > -1" ,
+                        condition = "$.inArray('Histogram', input.GC_PlotOptions) > -1 || $.inArray('Clustered Histogram', input.GC_PlotOptions) > -1" ,
                         sliderInput(
                           inputId="xybreaks", 
                           label = "Number of breaks for histogram:",
@@ -550,7 +558,7 @@ ui <- fluidPage(
                     # density
                     conditionalPanel(
                       br(),
-                      condition = "$.inArray('Density', input.GCPlotOptions) > -1", 
+                      condition = "$.inArray('Density', input.GC_PlotOptions) > -1", 
                       h5(id="GCdensityG_text", "Density Plot of Gene Connectivity"), 
                       br(),
                       plotOutput(outputId = "GCdensityG", height = "500px",),
@@ -560,7 +568,7 @@ ui <- fluidPage(
                     # histogram
                     conditionalPanel(
                       br(),
-                      condition = "$.inArray('Histogram', input.GCPlotOptions) > -1", 
+                      condition = "$.inArray('Histogram', input.GC_PlotOptions) > -1", 
                       h5(id="GChistogramG_text", "Histogram of Gene Connectivity"),
                       br(),
                       plotOutput(outputId = "GChistogramG", height = "500px",),
@@ -570,7 +578,7 @@ ui <- fluidPage(
                     # density (subset by clusters)
                     conditionalPanel(
                       br(),
-                      condition = "$.inArray('Clustered Density', input.GCPlotOptions) > -1", 
+                      condition = "$.inArray('Clustered Density', input.GC_PlotOptions) > -1", 
                       h5(id="GCdensitySubsetG_text", "Density plot of Gene Connectivity subset by their clusters"), 
                       br(),
                       plotOutput(outputId = "GCdensitySubsetG", height = "500px",),
@@ -580,7 +588,7 @@ ui <- fluidPage(
                     # histogram (subset by clusters)
                     conditionalPanel(
                       br(),
-                      condition = "$.inArray('Clustered Histogram', input.GCPlotOptions) > -1", 
+                      condition = "$.inArray('Clustered Histogram', input.GC_PlotOptions) > -1", 
                       h5(id="GChistogramSubsetG_text", "Histogram of Gene Connectivity subset by their clusters"), 
                       br(),
                       plotOutput(outputId = "GChistogramSubsetG", height = "500px",),
@@ -763,7 +771,7 @@ ui <- fluidPage(
                       
                       # # filt_min slider
                       # conditionalPanel(
-                      #   condition = "$.inArray('Histogram', input.GCPlotOptions) > -1 || $.inArray('Clustered Histogram', input.GCPlotOptions) > -1" ,
+                      #   condition = "$.inArray('Histogram', input.GC_PlotOptions) > -1 || $.inArray('Clustered Histogram', input.GC_PlotOptions) > -1" ,
                       #   sliderInput(
                       #     "xybreaks", 
                       #     label = "Number of breaks for histogram:",
