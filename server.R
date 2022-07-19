@@ -284,7 +284,7 @@ server <- function(input, output, session) {
         
 
         
-        #Initalise all values to 1
+        # Initalise all values to 1
         groups <- rep(1, nrow(labels))
         check <- rep(1, nrow(labels))
 
