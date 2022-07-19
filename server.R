@@ -347,7 +347,7 @@ server <- function(input, output, session) {
     hide(id = "FO_dropdown")
     sn$sub_nets <- NULL
 
-    #Remove any existing data from checkboxes
+    # Remove any existing data from checkboxes
     updateAwesomeCheckboxGroup(session, inputId = "GCPlotOptions", choices = c("Density", "Histogram", "Clustered Density", "Clustered Histogram"),)
     updateAwesomeCheckboxGroup(session, inputId = "FOPlotOptions", label = tags$h4("Select Plots"), choices = c("Network", "Heatmap"))
     updateAwesomeCheckboxGroup(session,  inputId = "FO_table_options", label = tags$h4("Select Tables"), choices = c("Functional Outliers", "Genes in Module"))
@@ -477,12 +477,6 @@ server <- function(input, output, session) {
 
 
 
-
-
-  
-
-
-
   # Add the Run buttons 
   observeEvent(
     input$generate_subnet,
@@ -552,7 +546,9 @@ server <- function(input, output, session) {
 
 
   ##################### CLUSTER GENES #####################
-
+  eventReactive({
+    
+  })
   observeEvent(
     {input$run},
     {
