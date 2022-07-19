@@ -199,6 +199,8 @@ ui <- fluidPage(
                 
 
                  ),
+
+                
                 tabPanel(
                   title="Plot DE",
                   h4("Plot Differential Expression"),
@@ -280,6 +282,7 @@ ui <- fluidPage(
             ##################### ASSESS DE TAB #####################
             tabPanel(
               title="Assess DE", 
+              
               # options dropdown
               dropdown(
 
@@ -334,8 +337,6 @@ ui <- fluidPage(
                   ),
                 ),
 
-                
-                
                 # generate subnet button
                 actionButton("generate_subnet", "Generate Subnetwork",),
       
@@ -356,23 +357,18 @@ ui <- fluidPage(
                   title="View Files",
                   tabsetPanel(
                     id="subnetwork_file_tabset",
-                     # view file tab
+
+                    # view file tab
                     tabPanel(
                       title="File",
                       uiOutput("UIDEContent"),
                     ),
+
                     # view subnetwork tab
                     tabPanel(
                       title="Subnetwork", 
                       br(),
                       tableOutput("subnetwork")
-                    ),
-
-                    # view file tab
-                    tabPanel(
-                      title="File",
-                      br(),
-                      uiOutput("UIDEContent")
                     ),
                   ),
                 ),

@@ -52,7 +52,7 @@ server <- function(input, output, session) {
 
   ##########################################################################################
   #                                                                                        #
-  #                                    RUN DE                                              #
+  #                                       RUN DE                                           #
   #                                                                                        #
   ##########################################################################################
   
@@ -261,99 +261,111 @@ server <- function(input, output, session) {
   })
 
 
-  # __________________________________Run DE Plots___________________________________________
+  ##########################################################################################
+  #                                                                                        #
+  #                                        RUN DE                                          #
+  #                                                                                        #
+  ##########################################################################################
 
   de <- reactiveValues(
     deg_output = NULL, 
   )
 
 
-  observeEvent(input$run_DE, {
-    labels <- labelsData()
-    counts_data <- countsData()
-    deg <- NULL
+  observeEvent(
+    input$run_DE, 
+    {
+      labels <- labelsData()
+      counts_data <- countsData()
+      deg <- NULL
 
-    # var <- labelsData()[[input$select_column]]
-    if (input$case_control_method == "Choose Case by Label") {
-      var <- input$select_column
-      case <- input$select_case
+      # var <- labelsData()[[input$select_column]]
+      if (input$case_control_method == "Choose Case by Label") {
+        var <- input$select_column
+        case <- input$select_case
 
-      # Format labels$var
-      labels_var <- labels[[paste0(var)]]
+        # Format labels$var
+        labels_var <- labels[[paste0(var)]]
 
-      #Initialise the variables of the chosen column to all be 1
-      groups <- rep(1, length(labels_var))
-      
-      # Pick the case, relabel as 2
-      groups[labels_var == case] = 2   
+        #Initialise the variables of the chosen column to all be 1
+        groups <- rep(1, length(labels_var))
+        
+        # Pick the case, relabel as 2
+        groups[labels_var == case] = 2   
 
-      filt = groups != 0 
-      deg <- calc_DE(counts_data[,filt], groups[filt], input$DE_method) 
-      de$deg_output <- deg
-
-    } else {
-      cases <- case_selected()
-      cases_removed <- remove_selected()
-      
-
-      
-      #Initalise all values to 1
-      groups <- rep(1, nrow(labels))
-      check <- rep(1, nrow(labels))
-
-      for (c in cases) {
-        groups[c] = 2
-      }
-      
-      for (d in cases_removed) {
-        groups[d] = 0
-      }
-      # No cases have been selected
-      print(groups)
-      print(check)
-      if (groups == check) {
-        shinyalert(title = "Invalid Input", text = "Please select cases to assess", type = "error")
-      } else {
-        deg <- calc_DE(counts_data, groups, input$DE_method) 
+        filt = groups != 0 
+        deg <- calc_DE(counts_data[,filt], groups[filt], input$DE_method) 
         de$deg_output <- deg
+
+      } else {
+        cases <- case_selected()
+        cases_removed <- remove_selected()
+        
+
+        
+        #Initalise all values to 1
+        groups <- rep(1, nrow(labels))
+        check <- rep(1, nrow(labels))
+
+        for (c in cases) {
+          groups[c] = 2
+        }
+        
+        for (d in cases_removed) {
+          groups[d] = 0
+        }
+
+        # No cases have been selected
+        print(groups)
+        print(check)
+        if (groups == check) {
+          shinyalert(title = "Invalid Input", text = "Please select cases to assess", type = "error")
+        } else {
+          deg <- calc_DE(counts_data, groups, input$DE_method) 
+          de$deg_output <- deg
+        }
+        
+
       }
       
+      if (!is.null(deg)) {
+        show(id="vol")
 
-    }
-    
+        # Volcano Plot
+        output$DEplot <- renderPlot(
+                {plot( deg$degs$log2_fc, -log10(deg$degs$pvals),  
+                pch=19, bty="n", 
+                xlab="log2 FC", ylab="-log10 p-vals" )},
+                width = 450,
+                height = 450
+        )
 
-    # Volcano Plot
-    if (!is.null(deg)) {
-      show(id="vol")
-      output$DEplot <- renderPlot(
-              {plot( deg$degs$log2_fc, -log10(deg$degs$pvals),  
-              pch=19, bty="n", 
-              xlab="log2 FC", ylab="-log10 p-vals" )},
-              width = 450,
-              height = 450
-      )
-
-      # MA Plot
-      show(id="MA")
-      #output$DE_MA_text = renderText("MA Plot")
-      output$DEplot_average <- renderPlot(
-              {plot( log2(deg$degs$mean_cpm),  deg$degs$log2_fc,  
-              pch=19, bty="n", 
-              ylab="log2 FC", xlab="Average expression (log2 CPM + 1)")},
-              width = 450,
-              height = 450
-      )
-    }
-    show(id = "assess_run_de")
+        # MA Plot
+        show(id="MA")
+        # output$DE_MA_text = renderText("MA Plot")
+        output$DEplot_average <- renderPlot(
+                {plot( log2(deg$degs$mean_cpm),  deg$degs$log2_fc,  
+                pch=19, bty="n", 
+                ylab="log2 FC", xlab="Average expression (log2 CPM + 1)")},
+                width = 450,
+                height = 450
+        )
+      }
+      show(id = "assess_run_de")
     }
   )
 
-  observeEvent(input$assess_run_de, { 
-    updateTabsetPanel(session, inputId="navpage", selected="Assess DE")
-    updateTabsetPanel(session, "subnetwork_file_tabset", selected = "Subnetwork")
-    updateRadioButtons(session, inputId="gene_list_selection", choices=c("Upload Gene List", "Generate Gene List", "Use DE results"), selected = "Use DE results")
-  })
+  # 
+  observeEvent(
+    input$assess_run_de, 
+    { 
+      updateTabsetPanel(session, inputId="navpage", selected="Assess DE")
+      updateTabsetPanel(session, "subnetwork_file_tabset", selected = "Subnetwork")
+      updateRadioButtons(session, inputId="gene_list_selection", choices=c("Upload Gene List", "Generate Gene List", "Use DE results"), selected = "Use DE results")
+    }
+  )
 
+  # 
   observe({
       # DEFile from fileInput() function
       ServerDEFile <- req(input$DEFile)
@@ -362,7 +374,7 @@ server <- function(input, output, session) {
       extDEFile <- tools::file_ext(ServerDEFile$datapath)
       if (is.null(input$DEFile)) {
         return ()
-      } else{
+      } else {
         if (extDEFile == "txt") {
           label = paste("Delimiters for", extDEFile, "file")
           choice <-c(Comma=",", Semicolon=";", Tab="\t", Space=" ")
@@ -467,7 +479,6 @@ server <- function(input, output, session) {
           else { 
             gene_list <- sample( EGAD::attr.human$name[EGAD::attr.human$chr==input$chooseChrome], input$chooseGeneNo,)
           }
-          
         }
         
         # upload gene_list
@@ -483,6 +494,7 @@ server <- function(input, output, session) {
     }
   )
   
+  # view files tab selection
   observeEvent(input$gene_list_selection, {
     if (input$gene_list_selection == "Upload Gene List") {
       updateTabsetPanel(session, "subnetwork_file_tabset", selected = "File")
@@ -798,6 +810,7 @@ server <- function(input, output, session) {
   )
 
   ##################### AUCs GSEA #####################
+  
   observeEvent(
     {input$GSEA_auc_run},
     {
