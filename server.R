@@ -420,11 +420,11 @@ server <- function(input, output, session) {
       if (input$gene_list_selection == "Use DE results") { 
           sn$sub_nets <- subset_network_hdf5(de$deg_output$degs, tolower(input$network_type), dir="../networks/")
           updateAwesomeCheckboxGroup(session, inputId="CG_PlotOptions", choices=c("Upregulated Network", "Upregulated Heatmap", "Upregulated Binarized Heatmap", "Downregulated Network", "Downregulated Heatmap", "Downregulated Binarized Heatmap"))
+          updateAwesomeCheckboxGroup(session, inputId="GSEA_type", choices=c("Standard GSEA", "AUCs GSEA"))
       } 
       
       # subnetwork from gene_list 
       else { 
-        updateAwesomeCheckboxGroup(session, inputId="CG_PlotOptions", choices=c("Network", "Heatmap", "Binarized Heatmap"))
         
         # generate gene_list
         if (input$gene_list_selection == "Generate Gene List") {
@@ -507,7 +507,6 @@ server <- function(input, output, session) {
         updateSliderInput(session, inputId = "xybreaks", min = 10, max = 150, value = input$chooseGeneNo, step = 10)
       }
       
-
       # GSEA
       show(id = "GSEA_dropdown")
       show(id = "GSEA_run")
@@ -526,15 +525,16 @@ server <- function(input, output, session) {
     medK <- as.numeric(sn$sub_nets$median)
 
     clust_net <- list() 
-    if (input$gene_list_selection == "Use DE results") { 
-      # For DE data 
+    # For DE data 
+    if (input$gene_list_selection == "Use DE results") {
       deg_sig <- sn$sub_nets$deg_sig
       fc_sig  <- sn$sub_nets$fc_sig
       clust_net[["down"]]  <- cluster_coexp(sub_net$down, medK = medK, flag_plot = FALSE)
       clust_net[["up"]]  <- cluster_coexp( sub_net$up, medK = medK, flag_plot = FALSE)
 
-    } else { 
-      # For gene list 
+    } 
+    # For gene list
+    else {  
       clust_net[["genes"]] <- cluster_coexp(sub_net$genes, medK = medK, flag_plot = FALSE)
     }
     return(clust_net)
@@ -815,19 +815,19 @@ server <- function(input, output, session) {
   ##################### ERROR MESSAGES #####################
 
   output$CG_error <- renderText({
-    print("Please upload/generate a gene list in OPTIONS")
+    print("Please generate a subnetwork in OPTIONS")
   })
 
   output$GC_error <- renderText({
-    print("Please upload/generate a gene list in OPTIONS")
+    print("Please generate a subnetwork in OPTIONS")
   }) 
 
   output$FO_error <- renderText({
-    print("Please upload/generate a gene list in OPTIONS")
+    print("Please generate a subnetwork in OPTIONS")
   })
 
   output$GSEA_error <- renderText({
-    print("Please upload/generate a gene list in OPTIONS")
+    print("Please generate a subnetwork in OPTIONS")
   }) 
 
 }

@@ -397,7 +397,7 @@ ui <- fluidPage(
                       awesomeCheckboxGroup(
                         inputId = "CG_PlotOptions",
                         label = tags$h4("Select Plots"), 
-                        choices = c("Network", "Heatmap", "Binarized Heatmap", "Upregulated Network", "Upregulated Heatmap", "Upregulated Binarized Heatmap", "Downregulated Network", "Downregulated Heatmap", "Downregulated Binarized Heatmap"),
+                        choices = c("Network", "Heatmap", "Binarized Heatmap"),
                         status = ""
                       ),
 
@@ -407,10 +407,10 @@ ui <- fluidPage(
                     ),  
 
                     br(),
-
                     # error message
                     textOutput("CG_error"),
-                    
+                    br(),
+
                     tabsetPanel(
 
                       # plots tab
@@ -728,7 +728,7 @@ ui <- fluidPage(
                       radioButtons(
                         inputId = "GSEA_type",
                         label = tags$h4("GSEA Type"),
-                        choices = c("Standard GSEA", "AUCs GSEA"),
+                        choices = c("Standard GSEA"),
                         selected = ""
                       ),
                       
