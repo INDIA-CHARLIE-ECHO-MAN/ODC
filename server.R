@@ -428,25 +428,23 @@ server <- function(input, output, session) {
         
         # generate gene_list
         if (input$gene_list_selection == "Generate Gene List") {
-          
+
+          chromNum <- strtoi(substring(input$chooseChrome,4))
+
           # error: invalid chromosome format
-          if (str_detect(input$chooseChrome, "chr[XY]") == FALSE && str_detect(input$chooseChrome, "chr[0-9]") == FALSE) {
+          if (!str_detect(input$chooseChrome, "chr[XY]") && !str_detect(input$chooseChrome, "chr[0-9]")) {
             shinyalert(title = "Invalid Input", text = "Please enter a Chromosome between 1 - 22, X, Y", type = "error")
             gene_list <- NULL
           } 
           
           # error: invalid chromosome number
-          else if (str_detect(substring(input$chooseChrome,4), "[0-9]")) {
-            if (strtoi(substring(input$chooseChrome,4)) < 1 || strtoi(substring(input$chooseChrome,4)) > 22) {
-              shinyalert(title = "Invalid Input", text = "Please enter a Chromosome between 1 - 22, X, Y", type = "error")
-              gene_list <- NULL
-            } else {
-              gene_list <- sample( EGAD::attr.human$name[EGAD::attr.human$chr==input$chooseChrome], input$chooseGeneNo,)
-            }
+          else if (str_detect(substring(input$chooseChrome,4), "[0-9]") && (chromNum < 1 || chromNum > 22)) {
+            shinyalert(title = "Invalid Input", text = "Please enter a Chromosome between 1 - 22, X, Y", type = "error")
+            gene_list <- NULL
           } 
           
           # error: invalid number of genes
-          else if (input$chooseGeneNo == "" || input$chooseGeneNo < 0) { 
+          else if (input$chooseGeneNo == "" || input$chooseGeneNo <= 0) { 
             shinyalert(title = "Invalid Input", text = "Please enter a valid number of Genes", type = "error")
             gene_list <- NULL
           } 
@@ -454,7 +452,7 @@ server <- function(input, output, session) {
           # generate gene_list from EGAD
           else { 
             gene_list <- sample( EGAD::attr.human$name[EGAD::attr.human$chr==input$chooseChrome], input$chooseGeneNo,)
-          }
+          } 
         }
         
         # upload gene_list
