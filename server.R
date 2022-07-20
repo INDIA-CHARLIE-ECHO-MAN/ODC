@@ -774,9 +774,9 @@ server <- function(input, output, session) {
   observeEvent(
     {input$GSEA_run},
     {
-      print(input$GSEA_type)
+      
       # Standard GSEA
-      if (input$GSEA_type.includes("Standard GSEA")) {
+      if ("Standard GSEA" %in% input$GSEA_type) {
         data(go_slim)
         data(go_voc)
         
@@ -825,7 +825,7 @@ server <- function(input, output, session) {
       }
 
       # AUCs GSEA
-      if (input$GSEA_type.includes('AUCs GSEA')) {
+      if ("AUCs GSEA" %in% input$GSEA_type) {
         
         data(go_slim_entrez)
       
