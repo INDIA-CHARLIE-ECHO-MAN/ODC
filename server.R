@@ -7,6 +7,8 @@ source("./src/calc_DE.R", local = TRUE)
 options(warn=-1)
 defaultW <- getOption("warn")
 
+#network_dir = "C:/Users/61435/Dropbox (Garvan)/outdeco_nets/"
+network_dir = "../networks/"
 
 server <- function(input, output, session) {
 
@@ -438,14 +440,11 @@ server <- function(input, output, session) {
   observeEvent(input$generate_subnet, {
     if (input$gene_list_selection == "Use DE results") { 
         # subnetwork from DE results 
-        sn$sub_nets <- subset_network_hdf5(de$deg_output$degs, tolower(input$network_type), dir="../networks/")
+        sn$sub_nets <- subset_network_hdf5(de$deg_output$degs, tolower(input$network_type), dir=network_dir)
         
 
     } else { 
       # subnetwork from Gene List 
-      print(input$chooseChrome)
-      
-
       if (input$gene_list_selection == "Generate Gene List") {
 
         if (str_detect(input$chooseChrome, "chr[XY]") == FALSE && str_detect(input$chooseChrome, "chr[0-9]") == FALSE) {
@@ -476,7 +475,7 @@ server <- function(input, output, session) {
       }
 
       if (!is.null(gene_list)) { 
-        sn$sub_nets <- subset_network_hdf5_gene_list(gene_list, tolower(input$network_type), dir="../networks/")
+        sn$sub_nets <- subset_network_hdf5_gene_list(gene_list, tolower(input$network_type), dir=network_dir)
       } 
     }
   })
@@ -671,8 +670,9 @@ server <- function(input, output, session) {
 
       # clustering genes table output
       show(id="CG_table_text")
+      
       output$CG_table <- renderDataTable(
-        {EGAD::attr.human[match(clust_net()$genes$clusters$genes,EGAD::attr.human$name[EGAD::attr.human$chr==input$chooseChrome],input$chooseGeneNo),]},
+        {EGAD::attr.human[match(clust_net()$genes$clusters$genes, EGAD::attr.human$name),]},
         # options=list(columnDefs = list(list(visible=FALSE, targets=c(0,1,2,3))))
       )
 
@@ -866,7 +866,7 @@ server <- function(input, output, session) {
       # heatmap output
       show(id="FO_heatmap_text")
       output$FO_heatmap <- renderPlot(
-        {plot_coexpression_heatmap(sub_net$genes, clust_net()$genes, filt = TRUE, flag_plot_bin = FALSE)},
+        {plot_coexpression_heatmap(sub_net$genes, clust_net()$genes, filt = TRUE, flag_plot_bin = FALSE, filt_min = filt_min)},
         width = 500,
         height = 500
       )
@@ -874,28 +874,28 @@ server <- function(input, output, session) {
       # network output
       show(id="FO_network_text")
       output$FO_network <- renderPlot(
-        {plot_network(1-sub_net$genes, clust_net()$genes, 1 - medK)},
+        {plot_network(1-sub_net$genes, clust_net()$genes, 1 - medK, filt_min = filt_min)},
         width = 500,
         height = 500
       )
 
       show(id="FOheatmap_upreg_text")
       output$FOheatmap_upreg <- renderPlot(
-        {plot_coexpression_heatmap(sub_net$up, clust_net()$up, filt = TRUE, flag_plot_bin = FALSE)}, 
+        {plot_coexpression_heatmap(sub_net$up, clust_net()$up, filt = TRUE, flag_plot_bin = FALSE, filt_min = filt_min)}, 
         width = 500,
         height = 500 
       )
 
       show(id="FOnetwork_upreg_text")
       output$FOnetwork_upreg <- renderPlot(
-        {plot_network(1-sub_net$up, clust_net()$up, 1 - medK)}, 
+        {plot_network(1-sub_net$up, clust_net()$up, 1 - medK, filt_min = filt_min)}, 
         width = 500, 
         height = 500
       )
 
       show(id="FOheatmap_downreg_text")
       output$FOheatmap_downreg <- renderPlot(
-        {plot_coexpression_heatmap(sub_net$down, clust_net()$down, filt = TRUE, flag_plot_bin = FALSE)}, 
+        {plot_coexpression_heatmap(sub_net$down, clust_net()$down, filt = TRUE, flag_plot_bin = FALSE, filt_min = filt_min)}, 
         width = 500, 
         height = 500 
       )
@@ -913,7 +913,7 @@ server <- function(input, output, session) {
         { clust_size <- plyr::count(clust_net()$genes$clusters$labels)
           clust_keep <- clust_size[clust_size[,2] < filt_min ,1]
           genes_keep <- !is.na(match(clust_net()$genes$clusters$labels, clust_keep))
-          EGAD::attr.human[match(clust_net()$genes$clusters$genes[!genes_keep],EGAD::attr.human$name[EGAD::attr.human$chr==input$chooseChrome], input$chooseGeneNo),]},
+          EGAD::attr.human[match(clust_net()$genes$clusters$genes[!genes_keep],EGAD::attr.human$name),]},
         # options=list(columnDefs = list(list(visible=FALSE, targets=c(0,1,2,3))))
       )
 
@@ -924,7 +924,7 @@ server <- function(input, output, session) {
         { clust_size <- plyr::count(clust_net()$genes$clusters$labels)
           clust_keep <- clust_size[clust_size[,2] < filt_min ,1]
           genes_keep <- !is.na(match(clust_net()$genes$clusters$labels, clust_keep))
-          EGAD::attr.human[match(clust_net()$genes$clusters$genes[genes_keep],EGAD::attr.human$name[EGAD::attr.human$chr==input$chooseChrome], input$chooseGeneNo),]},
+          EGAD::attr.human[match(clust_net()$genes$clusters$genes[genes_keep],EGAD::attr.human$name),]},
         # options=list(columnDefs = list(list(visible=FALSE, targets=c(0,1,2,3))))
       )
       
