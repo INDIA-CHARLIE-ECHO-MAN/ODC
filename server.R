@@ -2,6 +2,7 @@ source("./src/plot_functions.R", local = TRUE)
 source("./src/cluster_coexp.R", local = TRUE)
 source("./src/subset_network_hdf5.R", local = TRUE)
 source("./src/calc_DE.R", local = TRUE)
+source("./src/gene_set_enrichment.R", local = TRUE)
 
 # Warnings silenced for wilcox
 options(warn=-1)

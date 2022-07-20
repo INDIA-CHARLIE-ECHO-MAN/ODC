@@ -1,3 +1,4 @@
+library(OutDeCo)
 library(shinyWidgets)
 library(shinythemes)
 library(bslib)
