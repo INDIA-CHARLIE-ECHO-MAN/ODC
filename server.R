@@ -849,6 +849,9 @@ server <- function(input, output, session) {
           height = 500
         )
       }
+
+      # AUCs Heatmap
+      
     }
   )
 
