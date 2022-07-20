@@ -415,9 +415,7 @@ ui <- fluidPage(
 
                       # plots tab
                       tabPanel(
-                        br(),
                         title="Plots",
-                        br(),
 
                         # network
                         conditionalPanel(
@@ -489,9 +487,7 @@ ui <- fluidPage(
 
                       # tables tab
                       tabPanel(
-                        br(),
                         title="Tables",
-                        br(),
                         
                         # clustering genes
                         h5(id="CG_table_text", "Clustering Genes"), 
@@ -657,9 +653,7 @@ ui <- fluidPage(
 
                     # plots tab
                     tabPanel(
-                      br(),
                       title="Plots",
-                      br(),
                       
                       # heatmap
                       conditionalPanel(
@@ -679,9 +673,7 @@ ui <- fluidPage(
 
                     # tables tab
                     tabPanel(
-                      br(),
                       title="Tables", 
-                      br(),
 
                       # selected genes table output
                       conditionalPanel(
@@ -725,7 +717,7 @@ ui <- fluidPage(
                       status = "primary", width = "300px", size = "sm",
                       
                       # select GSEA type
-                      radioButtons(
+                      awesomeCheckboxGroup(
                         inputId = "GSEA_type",
                         label = tags$h4("GSEA Type"),
                         choices = c("Standard GSEA"),
@@ -734,52 +726,34 @@ ui <- fluidPage(
                       
                       # standard GSEA options
                       conditionalPanel(
-                        condition = "input.GSEA_type == 'Standard GSEA'", 
+                        condition = "input.GSEA_type.includes('Standard GSEA')", 
                         awesomeCheckboxGroup(
                           inputId = "GSEA_std_PlotOptions",
-                          label = tags$h4("Select Plots"), 
+                          label = tags$h4("Standard GSEA"), 
                           choices = c("P-value Heatmap"),
                           status = ""
-                        ),
-                        br(),
-                        # run button
-                        actionButton(
-                          inputId = "GSEA_std_run",
-                          label = "Run Standard GSEA",
-                          style="color: #fff; background-color: #3E3F3A; border-color: #20201F"
                         ),
                       ),
 
                       # AUCs GSEA options
                       conditionalPanel(
-                        condition = "input.GSEA_type == 'AUCs GSEA'", 
+                        condition = "input.GSEA_type.includes('AUCs GSEA')", 
                         awesomeCheckboxGroup(
                           inputId = "GSEA_auc_PlotOptions",
-                          label = tags$h4("Select Plots"), 
-                          choices = c("P-value Heatmap", "AUROC Graph", "AUC Histogram", "Gene Set Size Histogram", "Scatter Plot (AUCs vs P-values)"),
+                          label = tags$h4("AUCs GSEA"), 
+                          choices = c("AUROC Graph", "AUC Histogram", "Gene Set Size Histogram", "Scatter Plot (AUCs vs P-values)"),
                           status = ""
                         ),
-                        br(),
-                        # run button
-                        actionButton(
-                          inputId = "GSEA_auc_run",
-                          label = "Run AUCs GSEA",
-                          style="color: #fff; background-color: #3E3F3A; border-color: #20201F"
-                        ),
-
                       ),
                       
-                      # # filt_min slider
-                      # conditionalPanel(
-                      #   condition = "$.inArray('Histogram', input.GC_PlotOptions) > -1 || $.inArray('Clustered Histogram', input.GC_PlotOptions) > -1" ,
-                      #   sliderInput(
-                      #     "xybreaks", 
-                      #     label = "Number of breaks for histogram:",
-                      #     min = 10, max = 150, value = 100, step = 10,
-                      #   ),
-                      # ),
-                      
                       br(),
+
+                      # run button
+                      actionButton(
+                        inputId = "GSEA_run",
+                        label = "Run",
+                        style="color: #fff; background-color: #3E3F3A; border-color: #20201F"
+                      ),
 
                     ),
                     
@@ -790,20 +764,58 @@ ui <- fluidPage(
                   ),
                   br(),
                   
-                  # heatmap
-                  conditionalPanel(
-                    condition = "$.inArray('P-value Heatmap', input.GSEA_std_PlotOptions) > -1", 
-                    h4("P-value Heatmap"), 
-                    plotOutput(outputId = "GSEA_std_heatmap", height = "500px"),
-                  ),
+                  tabsetPanel(
 
-                  # AUROC Graph
-                  conditionalPanel(
-                    condition = "$.inArray('AUROC Graph', input.GSEA_auc_PlotOptions) > -1", 
-                    h4("AUROC Graph"), 
-                    plotOutput(outputId = "GSEA_AUROC", height = "500px"),
-                    br(),
-                  ),
+                    # Standard GSEA tab
+                    tabPanel(
+                      title="Standard",
+                      mainPanel(
+
+                        # heatmap
+                        conditionalPanel(
+                          condition = "$.inArray('P-value Heatmap', input.GSEA_std_PlotOptions) > -1", 
+                          h5(id="GSEA_heatmap_text", "P-value Heatmap"), 
+                          plotOutput(outputId = "GSEA_heatmap", height = "500px"),
+                        ),
+                        br(),
+
+                        # upregulated heatmap
+                        conditionalPanel(
+                          condition = "$.inArray('Upregulated P-value Heatmap', input.GSEA_std_PlotOptions) > -1", 
+                          h5(id="GSEA_up_heatmap_text", "Upregulated P-value Heatmap"), 
+                          plotOutput(outputId = "GSEA_up_heatmap", height = "500px"),
+                        ),
+                        br(),
+
+                        # downregulated heatmap
+                        conditionalPanel(
+                          condition = "$.inArray('Downregulated P-value Heatmap', input.GSEA_std_PlotOptions) > -1", 
+                          h5(id="GSEA_down_heatmap_text", "Downregulated P-value Heatmap"), 
+                          plotOutput(outputId = "GSEA_down_heatmap", height = "500px"),
+                        ),
+                        br(),
+
+                      )
+                    ),
+
+                    # AUCs GSEA tab
+                    tabPanel(
+                      title="AUC",
+                      mainPanel(
+                        # AUROC graph
+                        conditionalPanel(
+                          condition = "$.inArray('AUROC Graph', input.GSEA_auc_PlotOptions) > -1", 
+                          h5(id="GSEA_auroc_text", "AUROC Graph"), 
+                          plotOutput(outputId = "GSEA_auroc", height = "500px"),
+                        ),
+                        br(),
+
+                      )
+                    ),
+                  )
+                  
+
+                  
                   
                 ),
 

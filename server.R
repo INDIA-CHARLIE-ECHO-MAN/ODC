@@ -13,9 +13,10 @@ server <- function(input, output, session) {
   # hide(id = "GC_run")
   # hide(id = "CG_run")
   hide(id = "GC_dropdown")
-  hide(id = "cluster_dropdown")
   hide(id = "CG_dropdown")
+  hide(id = "GC_dropdown")
   hide(id = "FO_dropdown")
+  hide(id = "GSEA_dropdown")
   hide(id = "assess_run_de")
 
 
@@ -42,11 +43,16 @@ server <- function(input, output, session) {
   hide(id="GChistogramG_text")
   hide(id="GCdensitySubsetG_text")
   hide(id="GChistogramSubsetG_text")
-  #Functional Outliers
+  # Functional Outliers
   hide(id="FO_network_text")
   hide(id="FO_heatmap_text")
   hide(id="genes_not_keep_table_text")
   hide(id="genes_keep_table_text")
+  # GSEA
+  hide(id="GSEA_heatmap_text")
+  hide(id="GSEA_up_heatmap_text")
+  hide(id="GSEA_down_heatmap_text")
+  hide(id="GSEA_auroc_text")
 
 
 
@@ -421,6 +427,7 @@ server <- function(input, output, session) {
           sn$sub_nets <- subset_network_hdf5(de$deg_output$degs, tolower(input$network_type), dir="../networks/")
           updateAwesomeCheckboxGroup(session, inputId="CG_PlotOptions", choices=c("Upregulated Network", "Upregulated Heatmap", "Upregulated Binarized Heatmap", "Downregulated Network", "Downregulated Heatmap", "Downregulated Binarized Heatmap"))
           updateAwesomeCheckboxGroup(session, inputId="GSEA_type", choices=c("Standard GSEA", "AUCs GSEA"))
+          updateAwesomeCheckboxGroup(session, inputId="GSEA_std_PlotOptions", choices=c("Upregulated P-value Heatmap", "Downregulated P-value Heatmap"))
       } 
       
       # subnetwork from gene_list 
@@ -762,52 +769,86 @@ server <- function(input, output, session) {
     }
   )
 
-  ##################### Standard GSEA #####################
 
+  ##################### GSEA #####################  
   observeEvent(
-    {input$GSEA_std_run},
+    {input$GSEA_run},
     {
-      data(go_slim)
-      data(go_voc)
+      print(input$GSEA_type)
+      # Standard GSEA
+      if (input$GSEA_type.includes("Standard GSEA")) {
+        data(go_slim)
+        data(go_voc)
+        
+        # heatmap
+        show(id="GSEA_heatmap_text")
+        output$GSEA_heatmap <- renderPlot(
+          {
+            filt <- colSums(go_slim) < 5000 & colSums(go_slim) >= 10
+            gene_list <- clust_net()$genes$clusters$genes[clust_net()$genes$order]
+            go_enrich <- gene_set_enrichment(gene_list, go_slim[filt,], go_voc) 
+            plot_gene_set_enrichment(go_enrich, gene_list, go_slim[filt,])
+          },
+          width = 500,
+          height = 500
+        )
 
-      filt <- colSums(go_slim) < 5000 & colSums(go_slim) >= 10
-      gene_list <- clust_net()$genes$clusters$genes[clust_net()$genes$order]
-      go_enrich <- gene_set_enrichment(gene_list, go_slim[filt,], go_voc) 
+        # Use DE results
+        if (input$gene_list_selection == "Use DE results") {
+          # upregulated heatmap
+          show(id="GSEA_up_heatmap_text")
+          output$GSEA_up_heatmap <- renderPlot(
+            {
+              filt <- colSums(go_slim_entrez) < 5000 & colSums(go_slim_entrez) >= 10
+              gene_list <- clust_net()$up$clusters$genes[clust_net()$up$order]
+              go_enrich <- gene_set_enrichment(gene_list, go_slim_entrez[filt,], go_voc) 
+              plot_gene_set_enrichment( go_enrich, gene_list, go_slim_entrez[filt,]) 
+            },
+            width = 500,
+            height = 500
+          )
+          
+          # downregulated heatmap
+          show(id="GSEA_down_heatmap_text")
+          output$GSEA_down_heatmap <- renderPlot(
+            {
+              filt <- colSums(go_slim_entrez) < 5000 & colSums(go_slim_entrez) >= 10
+              gene_list <- clust_net()$down$clusters$genes[clust_net()$down$order]
+              go_enrich <- gene_set_enrichment(gene_list, go_slim_entrez[filt,], go_voc) 
+              plot_gene_set_enrichment(go_enrich, gene_list, go_slim_entrez[filt,]) 
+            },
+            width = 500,
+            height = 500
+          )
+        }
+        
+      }
+
+      # AUCs GSEA
+      if (input$GSEA_type.includes('AUCs GSEA')) {
+        
+        data(go_slim_entrez)
       
-      # standard GSEA heatmap
-      output$GSEA_std_heatmap <- renderPlot(
-        {plot_gene_set_enrichment(go_enrich, gene_list, go_slim[filt,])},
-        width = 500,
-        height = 500
-      )
-    }
-  )
+        gene_rankings <- order(log10(deg$degs$pvals), abs(deg$degs$log2_fc)) 
+        names(gene_rankings) <- rownames(deg$degs)
+        gene_rankings_rev <- rank(max(gene_rankings) - gene_rankings) 
+        
+        m <- match(rownames(go_slim_entrez), names(gene_rankings_rev))
+        f.g = !is.na(m)
+        f.r = m[f.g]
+        gene_sets = go_slim_entrez[f.g,]
+        gene_rankings_rev = rank(gene_rankings_rev[f.r])
 
-  ##################### AUCs GSEA #####################
-  
-  observeEvent(
-    {input$GSEA_auc_run},
-    {
-      data(go_slim)
-      
-      gene_rankings <- order(log10(deg$degs$pvals), abs(deg$degs$log2_fc)) 
-      names(gene_rankings) <- rownames(deg$degs)
-      gene_rankings_rev <- rank(max(gene_rankings) - gene_rankings) 
-      
-      m <- match(rownames(go_slim), names(gene_rankings_rev))
-      f.g = !is.na(m)
-      f.r = m[f.g]
-      gene_sets = go_slim[f.g,]
-      gene_rankings_rev = rank(gene_rankings_rev[f.r])
+        gene_set_aucs <- gene_set_enrichment_aucs(gene_sets, gene_rankings_rev) 
 
-      gene_set_aucs <- gene_set_enrichment_aucs(gene_sets, gene_rankings_rev) 
-
-      # 
-      output$GSEA_AUROC <- renderPlot(
-        {plot_gene_set_enrichment_ranked(gene_set_aucs, gene_rankings_rev, gene_list, go_slim)},
-        width = 500,
-        height = 500
-      )
+        # AUROC graph
+        show(id="GSEA_auroc_text")
+        output$GSEA_auroc <- renderPlot(
+          {plot_gene_set_enrichment_ranked(gene_set_aucs, gene_rankings_rev, gene_list, go_slim_entrez)},
+          width = 500,
+          height = 500
+        )
+      }
     }
   )
 
