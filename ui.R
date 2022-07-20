@@ -14,6 +14,7 @@ library(shinyjs)
 library(shinyalert)
 library(stringi)
 library(stringr)
+library(EGAD)
 
 ui <- fluidPage(
   useShinyjs(),
