@@ -16,6 +16,8 @@ library(stringi)
 library(stringr)
 library(EGAD)
 library(OutDeCo)
+library(shinyFiles)
+library(fs)
 
 ui <- fluidPage(
   useShinyjs(),
@@ -301,8 +303,20 @@ ui <- fluidPage(
                 selectInput(
                   inputId = "network_type",
                   label = NULL,
-                  choices = c("Blood", "Brain", "Generic"),
+                  choices = c("Blood", "Brain", "Generic", "Import local network"),
                   selected = "Generic"
+                ),
+
+                # import local network
+                conditionalPanel(
+                  condition = "input.network_type == 'Import local network'",
+                  shinyFilesButton("network_file", "Choose a file", title = "Please choose a network file:", multiple = FALSE, buttonType = "default"),
+                ),
+
+                # display file name of imported local network
+                conditionalPanel(
+                  condition = "input.network_file != NULL",
+                  textOutput("network_file_name")
                 ),
 
                 # gene list selection
