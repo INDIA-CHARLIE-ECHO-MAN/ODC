@@ -722,7 +722,7 @@ ui <- fluidPage(
                       awesomeCheckboxGroup(
                         inputId = "GSEA_type",
                         label = tags$h4("GSEA Type"),
-                        choices = c("Standard GSEA", "whats up"),
+                        choices = c("Standard GSEA"),
                         selected = ""
                       ),
                       
