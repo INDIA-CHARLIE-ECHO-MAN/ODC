@@ -852,19 +852,6 @@ server <- function(input, output, session) {
     }
   )
 
-  # manual network import
-    volumes = getVolumes()
-    observe({  
-    shinyFileChoose(input, "network_file", roots = volumes, session = session)
-    
-    if(!is.null(input$network_file)){
-      file_selected<-parseFilePaths(volumes, input$network_file)
-      file_path <- as.character(file_selected$datapath)
-      filename <- path_file(file_path)
-      output$network_file_name <- renderText(filename)    
-    }
-  })
-
   ##################### ERROR MESSAGES #####################
 
   output$CG_error <- renderText({
