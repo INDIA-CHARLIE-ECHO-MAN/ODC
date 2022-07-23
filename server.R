@@ -416,6 +416,15 @@ server <- function(input, output, session) {
     tableOutput("DEFileContent")
   })
 
+  # network upload 
+  #root <- '~'
+
+  output$select.folder <-
+    renderUI(expr = selectInput(inputId = 'folder.name',
+                                label = 'Folder Name',
+                                choices = list.dirs(path = "../networks",
+                                                    full.names = FALSE,
+                                                    recursive = FALSE)))
 
   # generate sub_nets
 
