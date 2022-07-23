@@ -416,24 +416,28 @@ server <- function(input, output, session) {
     tableOutput("DEFileContent")
   })
 
-  # network upload 
-  #root <- '~'
-
+  # network upload UI output
   output$select.folder <-
     renderUI(expr = selectInput(inputId = 'folder.name',
-                                label = 'Folder Name',
+                                label = 'Network Name',
                                 choices = list.dirs(path = "../networks",
                                                     full.names = FALSE,
                                                     recursive = FALSE)))
 
-  # generate sub_nets
+  # network upload select network
+  network_type <- reactive({
+    if (!is.null(input$folder.name)) {
+      return(input$folder.name)
+    }
+  })
 
+  # generate sub_nets
   observeEvent(
     input$generate_subnet, 
     {
       # subnetwork from DE results 
       if (input$gene_list_selection == "Use DE results") { 
-          sn$sub_nets <- subset_network_hdf5(de$deg_output$degs, tolower(input$network_type), dir="../networks/")
+          sn$sub_nets <- subset_network_hdf5(de$deg_output$degs, tolower(network_type()), dir="../networks/")
           updateAwesomeCheckboxGroup(session, inputId="CG_PlotOptions", choices=c("Upregulated Network", "Upregulated Heatmap", "Upregulated Binarized Heatmap", "Downregulated Network", "Downregulated Heatmap", "Downregulated Binarized Heatmap"))
           updateAwesomeCheckboxGroup(session, inputId="GSEA_type", choices=c("Standard GSEA", "AUCs GSEA"))
           updateAwesomeCheckboxGroup(session, inputId="GSEA_std_PlotOptions", choices=c("Upregulated P-value Heatmap", "Downregulated P-value Heatmap"))
@@ -478,7 +482,7 @@ server <- function(input, output, session) {
 
         # generate sub_nets
         if (!is.null(gene_list)) { 
-          sn$sub_nets <- subset_network_hdf5_gene_list(gene_list, tolower(input$network_type), dir="../networks/")
+          sn$sub_nets <- subset_network_hdf5_gene_list(gene_list, tolower(network_type()), dir="../networks/")
         } 
       }
     }
