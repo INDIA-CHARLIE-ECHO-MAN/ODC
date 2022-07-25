@@ -248,9 +248,7 @@ ui <- fluidPage(
                       h6(strong("Select Conditions")),
                       dataTableOutput("UILabelContentRemoveSelection"),                   
                     ),
-                    
                     actionButton(inputId="run_DE", label = "Run DE"),
-                  
                   ),
 
                     splitLayout(cellWidths = c("50%", "50%"), 
@@ -264,16 +262,10 @@ ui <- fluidPage(
                       #textOutput("DE_MA_text"),
                       h4(id="MA"," MA Plot", style="text-align: center;"),
                       column(12, plotOutput(outputId = "DEplot_average", height = "450px"), align = "center"),
-                      
                     )
-                          
                     ), 
                     actionButton(inputId="assess_run_de", label = "Assess DE Data"), 
-                  
-                  
-                 
                  ),
-                 
               ),
             ),
             
@@ -285,14 +277,14 @@ ui <- fluidPage(
 
                 # network selection
                 tags$h4("Network Selection"),
-                # selectInput(
-                #   inputId = "network_type",
-                #   label=NULL,
-                #   choices = c("Blood", "Brain", "Generic"),
-                #   selected = "Generic"
-                # ),
 
                 uiOutput("select.folder"),
+                radioButtons(
+                  inputId = "is_occr",
+                  label = "Use occr network?",
+                  choices = c("Yes", "No"),
+                  selected = "No"
+                ),
 
                 # gene list selection
                 radioButtons(
@@ -327,16 +319,7 @@ ui <- fluidPage(
                     accept = c(".csv", ".tsv", ".txt")
                   ),
                   # div(style = "margin-top: -25px"),
-                  # select delimiter (default is nothing until file is selected and handled in server side)
-                  radioButtons(
-                    inputId = 'sepButton', 
-                    label = 'Delimiter Selector', 
-                    choices = c(Default=''), 
-                    selected = ''
-                  ),
                 ),
-
-                
                 
                 # generate subnet button
                 actionButton("generate_subnet", "Generate Subnetwork",),
@@ -346,7 +329,6 @@ ui <- fluidPage(
                 status = "primary", width = "300px", size = "sm",
 
                ),
-              
               
               br(),
         
@@ -368,8 +350,6 @@ ui <- fluidPage(
                       title="Subnetwork", 
                       tableOutput("subnetwork")
                     ),
-
-                   
                   ),
                 ),
 

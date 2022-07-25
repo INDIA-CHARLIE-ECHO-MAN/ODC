@@ -425,13 +425,19 @@ server <- function(input, output, session) {
   network_path <- reactive({
     attachDir <- paste0("../networks/", network_type())
     return(paste0(attachDir, "/"))
-  })
-
+  }) 
 
   observeEvent(input$generate_subnet, {
     if (input$gene_list_selection == "Use DE results") { 
+
         # subnetwork from DE results 
-        sn$sub_nets <- subset_network_hdf5(de$deg_output$degs, tolower(network_type()), dir=network_path())
+        # determine occr
+        if (input$is_occr == "yes") {
+          sn$sub_nets <- subset_network_hdf5(de$deg_output$degs, tolower(network_type()), dir=network_path(), flag_occr = TRUE)
+        }
+        else {
+          sn$sub_nets <- subset_network_hdf5(de$deg_output$degs, tolower(network_type()), dir=network_path(), flag_occr = FALSE)
+        }
         updateAwesomeCheckboxGroup(session, inputId="clusterPlotOptions", choices=c("Upregulated Network", "Upregulated Heatmap", "Upregulated Binarized Heatmap", "Downregulated Network", "Downregulated Heatmap", "Downregulated Binarized Heatmap"))
         
 
@@ -479,14 +485,6 @@ server <- function(input, output, session) {
       updateTabsetPanel(session, "subnetwork_file_tabset", selected = "Subnetwork")
     }
   })
-
-
-
-
-
-  
-
-
 
   # Add the Run buttons 
   observeEvent(
