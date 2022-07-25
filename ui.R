@@ -285,12 +285,14 @@ ui <- fluidPage(
 
                 # network selection
                 tags$h4("Network Selection"),
-                selectInput(
-                  inputId = "network_type",
-                  label=NULL,
-                  choices = c("Blood", "Brain", "Generic"),
-                  selected = "Generic"
-                ),
+                # selectInput(
+                #   inputId = "network_type",
+                #   label=NULL,
+                #   choices = c("Blood", "Brain", "Generic"),
+                #   selected = "Generic"
+                # ),
+
+                uiOutput("select.folder"),
 
                 # gene list selection
                 radioButtons(

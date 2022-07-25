@@ -407,10 +407,31 @@ server <- function(input, output, session) {
     tableOutput("DEFileContent")
   })
 
+  # network upload UI output
+  output$select.folder <-
+    renderUI(expr = selectInput(inputId = 'folder.name',
+                                label = 'Network Name',
+                                choices = list.dirs(path = "../networks",
+                                                    full.names = FALSE,
+                                                    recursive = FALSE)))
+
+  # network upload select network
+  network_type <- reactive({
+    if (!is.null(input$folder.name)) {
+      return(input$folder.name)
+    }
+  })
+
+  network_path <- reactive({
+    attachDir <- paste0("../networks/", network_type())
+    return(paste0(attachDir, "/"))
+  })
+
+
   observeEvent(input$generate_subnet, {
     if (input$gene_list_selection == "Use DE results") { 
         # subnetwork from DE results 
-        sn$sub_nets <- subset_network_hdf5(de$deg_output$degs, tolower(input$network_type), dir="../networks/")
+        sn$sub_nets <- subset_network_hdf5(de$deg_output$degs, tolower(network_type()), dir=network_path())
         updateAwesomeCheckboxGroup(session, inputId="clusterPlotOptions", choices=c("Upregulated Network", "Upregulated Heatmap", "Upregulated Binarized Heatmap", "Downregulated Network", "Downregulated Heatmap", "Downregulated Binarized Heatmap"))
         
 
@@ -446,7 +467,7 @@ server <- function(input, output, session) {
       }
 
       if (!is.null(gene_list)) { 
-        sn$sub_nets <- subset_network_hdf5_gene_list(gene_list, tolower(input$network_type), dir="../networks/")
+        sn$sub_nets <- subset_network_hdf5_gene_list(gene_list, tolower(network_type()), dir=network_path())
       } 
     }
   })
