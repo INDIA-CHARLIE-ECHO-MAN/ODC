@@ -17,32 +17,50 @@ library(stringr)
 library(OutDeCo)
 library(EGAD)
 
+
 ui <- fluidPage(
+  
+  ######################################################################
+  #                                                                    #
+  #                               THEME                                #
+  #                                                                    #
+  ######################################################################
+
   useShinyjs(),
   chooseSliderSkin("Flat",  color = "#3E3F3A"),
   add_busy_spinner(spin = "dots", position = "bottom-right", color = "#3E3F3A"),
   
   titlePanel(title=div(img(src="ODClogo.png", height = 80), "OutDeCo")),
+
   theme = bs_theme(version = 5, bootswatch = "sandstone", 
                   heading_font = font_google("Poppins"), 
                   base_font = font_collection(font_google("Roboto")),
                   success = "#325D88"),
 
   tags$style(HTML(".js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar {background: #3E3F3A}")),
-  #navbarPage is top menu bar
-  navbarPage(title=NULL, id="navpage", collapsible = FALSE,
+  
 
-            ##################### HOME TAB #####################
-            tabPanel(
-              
-              title="Home",
+
+
+
+  navbarPage(
+    title = NULL, id = "navpage", collapsible = FALSE,
+
+            ######################################################################
+            #                                                                    #
+            #                             HOME TAB                               #
+            #                                                                    #
+            ######################################################################
+
+            tabPanel(title = "Home",
               icon = icon("home"),
 
               navlistPanel(
                 id = "Header", selected = NULL, well = FALSE, fluid = TRUE, widths = c(3, 9),
 
-                # about
-                tabPanel(title="About",
+                ########################### ABOUT ###########################
+
+                tabPanel(title = "About",
                   h3("What is OutDeCo?"),
                   p("Outlier detection through co-expression. Using the tools on this website you can:"),
                   p("- Run a differential expression (DE) analysis "),
@@ -51,8 +69,9 @@ ui <- fluidPage(
                   p("- Run a network connectivity analysis of DE results within a gene co-expression network"),
                 ),
                 
-                # differential analysis
-                tabPanel(title="Differential Analysis",
+                ########################### DIFFERENTIAL ANALYSIS ###########################
+
+                tabPanel(title = "Differential Analysis",
                   h3("Differential Expression Analysis"),
                   p("Statistical analysis to discover quantitative changes in expression levels between experimental groups."),
                   h5("Methods:"),
@@ -64,11 +83,11 @@ ui <- fluidPage(
                   p("Uses weighted mean of log ratio to analyse count data and test for differential expression."),
                   br(),
                   em("Note: This tool is under construction")
-                   
                 ),
 
-                # cluster genes
-                tabPanel(title="Cluster Genes",
+                ########################### CLUSTER GENES ###########################
+
+                tabPanel(title = "Cluster Genes",
                   h3("Cluster Genes"),
                   p('Creates modules which are clusters of genes that are hightly co-expressed'),
                   h5("Plot Types"),
@@ -82,10 +101,11 @@ ui <- fluidPage(
                   p("up-regulated or down-regulated binary co-expression sub-network"),
                   br(),
                   em("Note: This tool is under construction")
-                 ),
+                ),
 
-                # gene connectivity 
-                tabPanel(title="Gene Connectivity",
+                ########################### GENE CONNECTIVITY ###########################
+
+                tabPanel(title = "Gene Connectivity",
                   h3("Gene Connectivity"),
                   p('Calculates node degrees to get a sense of the global and local connectivities of the gene'),
                   h5("Plot Types"),
@@ -99,11 +119,11 @@ ui <- fluidPage(
                   img(src="plot_scatter_hist_down_colored.png", height = 200), 
                   br(),
                   em("Note: This tool is under construction"),
-                   
                 ),
                  
-                # functional outliers
-                tabPanel(title="Functional Outliers",
+                ########################### FUNCTIONAL OUTLIERS ###########################
+
+                tabPanel(title = "Functional Outliers",
                   h3("Functional Outliers"),
                   p("Functional outliers are genes that have been identified to be potentially dysregulated. 
                   They are the genes that are Differentially Expressed but do not show local co-expression"),
@@ -121,7 +141,8 @@ ui <- fluidPage(
                   em("Note: This tool is under construction"),
                 ),
                 
-                # GSEA
+                ########################### GSEA ###########################
+
                 tabPanel(
                   title="Gene Set Enrichment Analysis",
                   h3("Gene Set Enrichment Analysis (GSEA)"),
@@ -135,332 +156,366 @@ ui <- fluidPage(
                   img(src="go_enrich_ranked.png", height = 200),
                   br(),
                   em("Note: This tool is under construction")
-                 ),
+                ),
                  
               )
             ),
 
-            ##################### RUN DE TAB #####################
-            tabPanel(
-              title="Run DE", 
+            ######################################################################
+            #                                                                    #
+            #                            RUN DE TAB                              #
+            #                                                                    #
+            ######################################################################
+            
+            tabPanel(title = "Run DE", 
 
-              # side panel for upload options
+              # options dropdown
               dropdown(
-                tags$h3("Options"), 
-                # side panel characteristics
+
+                # dropdown characteristics
                 style = "jelly", icon = "FILE OPTIONS",
                 status = "primary", width = "300px", size = "sm",
-               
-                # title of sidepanel
-                fluidPage(
-                # inputs in the sidepanel
-                  fileInput("counts_file", label = "Choose Counts Data File"),
-                  
-                  radioButtons(
-                    inputId = 'sepCountsButton', 
-                    label = 'Delimiter Selector', 
-                    choices = c(Comma=",", Semicolon=";", Tab="\t", Space=" "), 
-                    selected = ''
-                  ),
 
-                  fileInput("labels_file", "Choose Labels File",
-                    accept = c(
-                    "text/csv",
-                    "text/comma-separated-values,text/plain",
-                    ".csv")
-                  ),
+                # data selection
+                tags$h3("Data Selection"),
 
-                  radioButtons(
-                      inputId = 'sepLabelsButton', 
-                      label = 'Delimiter Selector', 
-                      choices = c(Comma=",", Semicolon=";", Tab="\t", Space=" "),
-                      selected = ''
-                  ),
+                # counts data file
+                fileInput(inputId = "DE_run_counts_file", label = "Choose Counts Data File"),
+                
+                radioButtons( # delimiter selector
+                  inputId = 'DE_run_counts_sep', 
+                  label = 'Delimiter Selector',
+                  choices = c(Comma = ",", Semicolon = ";", Tab = "\t", Space = " "), 
+                  selected = ''
+                ),
 
-                ), 
-               ),
+                # labels file
+                fileInput(inputId = "DE_run_labels_file", label = "Choose Labels File",
+                  accept = c(
+                  "text/csv",
+                  "text/comma-separated-values,text/plain",
+                  ".csv")
+                ),
 
+                radioButtons( # delimiter selector
+                  inputId = 'DE_run_labels_sep', 
+                  label = 'Delimiter Selector', 
+                  choices = c(Comma = ",", Semicolon = ";", Tab = "\t", Space = " "),
+                  selected = ''
+                ),
 
-               br(),
-               navlistPanel(
+              ),
+
+              br(),
+
+              navlistPanel(
                 widths = c(3, 9), well = FALSE,
-                tabPanel(
-                  title="View File",
+                
+                ########################### VIEW FILE ###########################
+
+                tabPanel(title = "View File",
 
                   tabsetPanel(
-                    id="counts_labels_tabset",
+                    id = "DE_run_VF_tabset",
+
+                    # counts file
                     tabPanel(
-                      title="Counts File",
+                      title = "Counts File",
                       dataTableOutput("UICountsContent")
                     ),
+
+                    # labels file
                     tabPanel(
-                      title="Labels File",
+                      title = "Labels File",
                       dataTableOutput("UILabelContent")
                     ),
-                    
-                  )
-                
 
-                 ),
-                tabPanel(
-                  title="Plot DE",
+                  )
+                ),
+
+                ########################### PLOT DE ###########################
+
+                tabPanel(title = "Plot DE",
+
                   h4("Plot Differential Expression"),
-                  p(id = "runDE_error", "Please upload counts and labels data in FILE OPTIONS"),
+                  p(id = "DE_plot_error", "Please upload counts and labels data in FILE OPTIONS", style = "color:red"),
+
+                  # options dropdown
                   dropdown(
-                    inputId = "DE_options",
-                    # side panel characteristics
+
+                    inputId = "DE_run_PD_options",
+
+                    # dropdown characteristics
                     style = "minimal", icon = "OPTIONS",
                     status = "primary", width = "600px", size = "sm",
 
-                  selectInput(
-                    inputId = "DE_method",
-                    label= tags$h5("Choose DE Method"),
-                    choices = c("wilcox", "DESeq2", "edgeR"),
-                    selected = NULL,
-                    width = "600px",
-                  ),
-                  
+                    # DE method
+                    selectInput(
+                      inputId = "DE_run_PD_options_method",
+                      label = tags$h5("Choose DE Method"),
+                      choices = c("wilcox", "DESeq2", "edgeR"),
+                      selected = NULL,
+                      width = "600px",
+                    ),
                     
+                    # case control method
                     radioButtons(
-                    inputId = "case_control_method",
-                    label = tags$h5("Case/Control Selection"),
-                    choices = c("Choose Case by Label", "Choose Case/Controls individually"),
-                    selected = ""
+                      inputId = "DE_run_PD_options_control_case",
+                      label = tags$h5("Case/Control Selection"),
+                      choices = c("Choose Case by Label", "Choose Case/Controls individually"),
+                      selected = "",
                     ),
-                   
-                    conditionalPanel(condition = "input.case_control_method == 'Choose Case by Label'", 
+
+
+                    conditionalPanel(
+                      condition = "input.DE_run_PD_options_control_case == 'Choose Case by Label'",
+
                       selectInput(
-                        inputId="select_column",
-                        label= "Select label to group ",
-                        choices = NULL, #no choice before uploading
+                        inputId = "DE_run_PD_options_column",
+                        label = "Select label to group",
+                        choices = NULL, # no choice before uploading
                         width = "600px",
                       ),
                   
                       selectInput(
-                        inputId="select_case",
+                        inputId = "DE_run_PD_options_case",
                         label= "Select case to analyse",
-                        choices = NULL, #no choice before column selected
+                        choices = NULL, # no choice before column selected
                         width = "600px",
                       ),
 
                     ),
 
-                    conditionalPanel(condition = "input.case_control_method == 'Choose Case/Controls individually'", 
+                    conditionalPanel(
+                      condition = "input.DE_run_PD_options_case == 'Choose Case/Controls individually'",
+
                       h6(strong("Select Cases")),
                       dataTableOutput("UILabelContentSelection"),   
                       h6(strong("Select Conditions")),
                       dataTableOutput("UILabelContentRemoveSelection"),                   
                     ),
                     
-                    actionButton(inputId="run_DE", label = "Run DE"),
+                    # run DE button
+                    actionButton(inputId = "DE_run", label = "Run DE"),
                   
                   ),
 
-                    splitLayout(cellWidths = c("50%", "50%"), 
+                  splitLayout(cellWidths = c("50%", "50%"), 
+
+                    # volcano plot
                     fluidPage(
-                      #textOutput("DE_V_text"),
-                      h4(id="vol"," Volcano Plot", style="text-align: center;"),
-                      column(12, plotOutput(outputId = "DEplot", height = "450px"), align = "center"), 
-                      
+                      h4(id = "DE_vol_text", label = "Volcano Plot", style = "text-align: center;"),
+                      column(12, plotOutput(outputId = "DE_vol_plot", height = "450px"), align = "center"), 
                     ),
+                    
+                    # MA plot
                     fluidPage(
-                      #textOutput("DE_MA_text"),
-                      h4(id="MA"," MA Plot", style="text-align: center;"),
-                      column(12, plotOutput(outputId = "DEplot_average", height = "450px"), align = "center"),
-                      
+                      h4(id = "DE_MA_text", label = "MA Plot", style = "text-align: center;"),
+                      column(12, plotOutput(outputId = "DE_MA_plot", height = "450px"), align = "center"),
                     )
-                          
-                    ), 
-                    actionButton(inputId="assess_run_de", label = "Assess DE Data"), 
+
+                  ),
+
+                  # run button
+                  actionButton(inputId = "DE_run_assess", label = "Assess DE Data"), 
                   
                   
                  
-                 ),
+                ),
                  
               ),
             ),
             
-            ##################### ASSESS DE TAB #####################
-            tabPanel(
-              title="Assess DE", 
+            ######################################################################
+            #                                                                    #
+            #                           ASSESS DE TAB                            #
+            #                                                                    #
+            ######################################################################
+
+            tabPanel(title = "Assess DE", 
+
               # options dropdown
               dropdown(
 
+                # dropdown characteristics
+                style = "jelly", icon = "NETWORK OPTIONS",
+                status = "primary", width = "300px", size = "sm",
+
                 # network selection
-                tags$h4("Network Selection"),
                 selectInput(
-                  inputId = "network_type_DE",
-                  label=NULL,
+                  inputId = "DE_options_network",
+                  label = tags$h4("Network Selection"),
                   choices = c("Blood", "Brain", "Generic"),
                   selected = "Generic"
                 ),
 
                 # gene list selection
                 radioButtons(
-                  inputId = "DE_data_selection",
+                  inputId = "DE_options_data",
                   label = tags$h4("DE Data Selection"),
                   choices = c("Use DE Results"),
                   selected = "Use DE Results"
                 ),
-
-                
                 
                 # generate subnet button
-                actionButton("generate_subnet_DE", "Generate Subnetwork",),
-      
-                # side panel characteristics
-                style = "jelly", icon = "NETWORK OPTIONS",
-                status = "primary", width = "300px", size = "sm",
+                actionButton("DE_generate_subnet", "Generate Subnetwork",),
 
-               ),
-              
+              ),
               
               br(),
         
               navlistPanel(
                 widths = c(3, 9), well = FALSE,
                 
-                # VIEW FILES
-                tabPanel(
-                  title="View Files",
+                ########################### VIEW FILES ###########################
+
+                tabPanel(title = "View Files",
+                  
                   tabsetPanel(
-                    id="subnetwork_file_tabset_DE",
-                     # view file tab
-                    # tabPanel(
-                    #   title="File",
-                    #   uiOutput("UIDEContent"),
-                    # ),
-                    # view subnetwork tab
-                    tabPanel(
-                      title = "DE Data", 
-                      dataTableOutput("DE_table"),
-                    ),
-                    tabPanel(
-                      title="Subnetwork", 
-                      tableOutput("subnetwork_DE")
+                    id = "DE_VF_tabset",
+
+                    # DE data
+                    tabPanel(title = "DE Data",
+                      br(),
+                      dataTableOutput("DE_VF_table"),
                     ),
 
+                    # DE subnetwork
+                    tabPanel(title = "Subnetwork", 
+                      br(),
+                      tableOutput("DE_VF_subnetwork")
+                    ),
                    
                   ),
                 ),
 
-                # CLUSTER GENES
-                tabPanel(
-                  title="Cluster Genes",
+                ########################### CLUSTER GENES ###########################
+
+                tabPanel(title = "Cluster Genes",
+
                   mainPanel(
                     h3("Cluster Genes"),
-                    br(),
+
                     # options dropdown
                     dropdown(
-                      inputId = "CG_dropdown_DE",
+                      inputId = "DE_CG_options",
+
+                      # dropdown characteristics
                       style = "minimal", icon = "OPTIONS",
                       status = "primary", width = "300px", size = "sm",
 
+                      # upregulated
                       awesomeCheckboxGroup(
-                        inputId = "clusterPlotOptions_upreg", 
+                        inputId = "DE_CG_options_up", 
                         label = tags$h4("Upregulated"),
                         choices = c("Network", "Heatmap", "Binarized Heatmap"),
                         status = ""
                       ), 
-
+                      
+                      # downregulated
                       awesomeCheckboxGroup(
-                        inputId = "clusterPlotOptions_downreg", 
+                        inputId = "DE_CG_options_down", 
                         label = tags$h4("Downregulated"), 
                         choices = c("Network", "Heatmap", "Binarized Heatmap"), 
                         status = ""
                       ),
 
                       # run button
-                      actionButton(inputId = "runCGDE", label = "Run",),
+                      actionButton(inputId = "DE_CG_run", label = "Run",),
                     ),  
                     
                     # error message
-                    textOutput("CG_error_DE"),
+                    p(id = "DE_CG_error", "Please generate a subnetwork in OPTIONS.", style = "color:red"),
                     br(),
                     
                     tabsetPanel(
 
-                      # plots tab
-                      tabPanel(
-                        br(),
-                        title="Plots",
-                        br(),
+                      # upregulated tab
+                      tabPanel(title="Upregulated",
 
-                      
+                        # upregulated - network
                         conditionalPanel(
-                          condition = "$.inArray('Network', input.clusterPlotOptions_upreg) > -1", 
-                          h5(id="CGupreg_network_text", "Network of Clustered, Upregulated Genes"), 
+                          condition = "$.inArray('Network', input.DE_CG_options_up) > -1", 
+                          h5(id = "DE_CG_up_network_text", "Network of Clustered, Upregulated Genes"), 
+                          plotOutput(outputId = "DE_CG_up_network_plot", height = "500px"), 
                           br(), 
-                          plotOutput(outputId = "upregNetwork", height = "500px"), 
                         ),
 
+                        # upregulated - heatmap
                         conditionalPanel(
-                          condition = "$.inArray('Heatmap', input.clusterPlotOptions_upreg) > -1", 
-                          h5(id="CGupreg_heatmap_text","Heatmap of Clustered, Upregulated Genes"), 
+                          condition = "$.inArray('Heatmap', input.DE_CG_options_up) > -1", 
+                          h5(id = "DE_CG_up_heatmap_text","Heatmap of Clustered, Upregulated Genes"), 
+                          plotOutput(outputId = "DE_CG_up_heatmap_plot", height = "500px"),
                           br(), 
-                          plotOutput(outputId = "upregHeatmap", height = "500px"),
                         ),
 
+                        # upregulated - binarized heatmap
                         conditionalPanel(
-                          condition = "$.inArray('Binarized Heatmap', input.clusterPlotOptions_upreg) > -1", 
-                          h5(id="CGupreg_bheatmap_text","Binarized Hatmap of Clustered, Upregulated Genes"), 
+                          condition = "$.inArray('Binarized Heatmap', input.DE_CG_options_up) > -1", 
+                          h5(id = "DE_CG_up_bheatmap_text","Binarized Heatmap of Clustered, Upregulated Genes"), 
+                          plotOutput(outputId = "DE_CG_up_bheatmap_plot", height = "500px"),
                           br(),
-                          plotOutput(outputId = "upregbinHeatmap", height = "500px"), 
                         ), 
 
+                      ),
+
+                      # downregulated tab
+                      tabPanel(title="Downregulated",
+
+                        # downregulated - network
                         conditionalPanel(
-                          condition = "$.inArray('Network', input.clusterPlotOptions_downreg) > -1",
-                          h5(id="CGdownreg_network_text", "Network of Clustered, Downregulated Genes"), 
+                          condition = "$.inArray('Network', input.DE_CG_options_down) > -1",
+                          h5(id = "DE_CG_down_network_text", "Network of Clustered, Downregulated Genes"), 
+                          plotOutput(outputId = "DE_CG_down_network_plot", height = "500px"),
                           br(), 
-                          plotOutput(outputId = "downregNetwork", height = "500px"),
                         ), 
 
+                        # downregulated - heatmap
                         conditionalPanel(
-                          condition = "$.inArray('Heatmap', input.clusterPlotOptions_downreg) > -1", 
-                          h5(id="CGdownreg_heatmap_text", "Heatmap of Clustered, Downregulated Genes"), 
+                          condition = "$.inArray('Heatmap', input.DE_CG_options_down) > -1", 
+                          h5(id = "DE_CG_down_heatmap_text", "Heatmap of Clustered, Downregulated Genes"), 
+                          plotOutput(outputId = "DE_CG_down_heatmap_plot", height = "500px"),
                           br(), 
-                          plotOutput(outputId = "downregHeatmap", height = "500px"),
                         ), 
 
+                        # downregulated - binarized heatmap
                         conditionalPanel(
-                          condition = "$.inArray('Binarized Heatmap', input.clusterPlotOptions_downreg) > -1", 
-                          h5(id="CGdownreg_bheatmap_text", "Binarized Heatmap of Clustered, Downregulated Genes"), 
+                          condition = "$.inArray('Binarized Heatmap', input.DE_CG_options_down) > -1", 
+                          h5(id = "DE_CG_down_bheatmap_text", "Binarized Heatmap of Clustered, Downregulated Genes"), 
+                          plotOutput(outputId = "DE_CG_down_bheatmap_plot", height = "500px"),
                           br(), 
-                          plotOutput(outputId = "downregbinHeatmap", height = "500px"),    
                         ),
 
                       ),
 
-                      
                     )
-
                   )
                 ),
                 
-                # GENE CONNECTIVITY
-                tabPanel(
-                  title="Gene Connectivity",
+                ########################### GENE CONNECTIVITY ###########################
+
+                tabPanel(title = "Gene Connectivity",
 
                   mainPanel(
                     h3("Gene Connectivity"),
                     
                     # options dropdown
                     dropdown(
-                      inputId = "GC_dropdown_DE",
+                      inputId = "DE_GC_options",
                       style = "minimal", icon = "OPTIONS",
                       status = "primary", width = "300px", size = "sm",
 
                       # select plots
                     
                       awesomeCheckboxGroup(
-                        inputId = "GCPlotOptions_upreg", 
+                        inputId = "DE_GC_options_up", 
                         label = tags$h4("Upregulated"),
                         choices = c("Density", "Histogram", "Clustered Density", "Clustered Histogram"), 
                         status = ""
                       ), 
 
                       awesomeCheckboxGroup(
-                        inputId = "GCPlotOptions_downreg", 
+                        inputId = "DE_GC_options_down", 
                         label = tags$h4("Downregulated"),
                         choices =  c("Density", "Histogram", "Clustered Density", "Clustered Histogram"),
                         status = ""
@@ -469,210 +524,215 @@ ui <- fluidPage(
                       
                       # histogram breaks slider
                       conditionalPanel(
-                        condition = "$.inArray('Histogram', input.GCPlotOptions_upreg) > -1 || $.inArray('Clustered Histogram', input.GCPlotOptions_upreg) > -1 || $.inArray('Histogram', input.GCPlotOptions_downreg) > -1 || $.inArray('Clustered Histogram', input.GCPlotOptions_downreg) > -1" ,
+                        condition = "$.inArray('Histogram', input.DE_GC_options_up) > -1 || $.inArray('Clustered Histogram', input.DE_GC_options_up) > -1 || $.inArray('Histogram', input.DE_GC_options_down) > -1 || $.inArray('Clustered Histogram', input.DE_GC_options_down) > -1" ,
                         sliderInput(
-                          inputId="xybreaks_DE", 
+                          inputId = "DE_GC_options_xybreaks", 
                           label = "Number of breaks for histogram:",
                           min = 10, max = 100, value = 100, step = 10,
                         ),
                       ),
-                      
-                      br(),
 
                       # run button
-                      actionButton(inputId = "runGCDE", label = "Run", ),
+                      actionButton(inputId = "DE_GC_run", label = "Run"),
 
                     ),
-                    
-                    br(),
 
                     # error message
-                    textOutput("GC_error_DE"),
+                    p(id = "DE_GC_error", "Please generate a subnetwork in OPTIONS.", style = "color:red"),
+                    br(),
 
-                    # density - upreg 
-                    conditionalPanel(
-                      condition = "$.inArray('Density', input.GCPlotOptions_upreg) > -1", 
-                      h5(id="GCdensityG_upreg_text", "Density Plot of Upregulated Gene Connectivity"), 
-                      plotOutput(outputId = "GCdensityGupreg", height = "500px",),
+                    tabsetPanel(
+
+                      # upregulated tab
+                      tabPanel(title="Upregulated",
+
+                        # upregulated - density
+                        conditionalPanel(
+                          condition = "$.inArray('Density', input.DE_GC_options_up) > -1", 
+                          h5(id = "DE_GC_up_density_text", "Density Plot of Upregulated Gene Connectivity"), 
+                          plotOutput(outputId = "DE_GC_up_density_plot", height = "500px",),
+                          br(),
+                        ),
+
+                        # upregulated - histogram
+                        conditionalPanel(
+                          condition = "$.inArray('Histogram', input.DE_GC_options_up) > -1", 
+                          h5(id = "DE_GC_up_hist_text", "Histogram of Upregulated Gene Connectivity"),
+                          plotOutput(outputId = "DE_GC_up_hist_plot", height = "500px",),
+                          br(),
+                        ),
+
+                        # upregulated - density (subset by clusters)
+                        conditionalPanel(
+                          condition = "$.inArray('Clustered Density', input.DE_GC_options_up) > -1", 
+                          h5(id = "DE_GC_up_density_subset_text", "Density plot of Upregulated Gene Connectivity subset by their clusters"), 
+                          plotOutput(outputId = "DE_GC_up_density_subset_plot", height = "500px",),
+                          br(),
+                        ),
+
+                        # upregulated - histogram (subset by clusters)
+                        conditionalPanel(
+                          condition = "$.inArray('Clustered Histogram', input.DE_GC_options_up) > -1", 
+                          h5(id = "DE_GC_up_hist_subset_text", "Histogram of Upregulated Gene Connectivity subset by their clusters"), 
+                          plotOutput(outputId = "DE_GC_up_hist_subset_plot", height = "500px",),
+                          br(),
+                        ),
+                        
+                      ),
+
+                      # downregulated tab
+                      tabPanel(title="Downregulated",
+                        
+                        # downregulated - density 
+                        conditionalPanel(
+                          condition = "$.inArray('Density', input.DE_GC_options_down) > -1", 
+                          h5(id = "DE_GC_down_density_text", "Density Plot of Downregulated Gene Connectivity"), 
+                          plotOutput(outputId = "DE_GC_down_density_plot", height = "500px",),
+                          br(),
+                        ),
+
+                        # downregulated - histogram
+                        conditionalPanel(
+                          condition = "$.inArray('Histogram', input.DE_GC_options_down) > -1", 
+                          h5(id = "DE_GC_down_hist_text", "Histogram of Downregulated Gene Connectivity"),
+                          plotOutput(outputId = "DE_GC_down_hist_plot", height = "500px",),
+                          br(),
+                        ),
+
+                        # downregulated - density (subset by clusters)
+                        conditionalPanel(
+                          condition = "$.inArray('Clustered Density', input.DE_GC_options_down) > -1", 
+                          h5(id = "DE_GC_down_density_subset_text", "Density plot of Downregulated Gene Connectivity subset by their clusters"), 
+                          plotOutput(outputId = "DE_GC_down_density_subset_plot", height = "500px",),
+                          br(),
+                        ),
+
+                        # downregulated - histogram (subset by clusters)
+                        conditionalPanel(
+                          condition = "$.inArray('Clustered Histogram', input.DE_GC_options_down) > -1", 
+                          h5(id = "DE_GC_down_hist_subset_text", "Histogram of Dowregulated Gene Connectivity subset by their clusters"), 
+                          plotOutput(outputId = "DE_GC_down_hist_subset_plot", height = "500px",),
+                          br(),
+                        ),
+
+                      ),
                     ),
-
-                    # histogram - upreg 
-                    conditionalPanel(
-                      condition = "$.inArray('Histogram', input.GCPlotOptions_upreg) > -1", 
-                      h5(id="GChistogramG_upreg_text", "Histogram of Upregulated Gene Connectivity"),
-                      plotOutput(outputId = "GChistogramGupreg", height = "500px",),
-                    ),
-
-                    # density (subset by clusters) - upreg 
-                    conditionalPanel(
-                      condition = "$.inArray('Clustered Density', input.GCPlotOptions_upreg) > -1", 
-                      h5(id="GCdensitySubsetG_upreg_text", "Density plot of Upregulated Gene Connectivity subset by their clusters"), 
-                      plotOutput(outputId = "GCdensitySubsetGupreg", height = "500px",),
-                    ),
-
-                    # histogram (subset by clusters) - upreg 
-                    conditionalPanel(
-                      condition = "$.inArray('Clustered Histogram', input.GCPlotOptions_upreg) > -1", 
-                      h5(id="GChistogramSubsetG_upreg_text", "Histogram of Upregulated Gene Connectivity subset by their clusters"), 
-                      plotOutput(outputId = "GChistogramSubsetGupreg", height = "500px",),
-                    ),
-
-                    # density - downreg 
-                    conditionalPanel(
-                      condition = "$.inArray('Density', input.GCPlotOptions_downreg) > -1", 
-                      h5(id="GCdensityG_downreg_text", "Density Plot of Downregulated Gene Connectivity"), 
-                      plotOutput(outputId = "GCdensityGdownreg", height = "500px",),
-                    ),
-
-                    # histogram - downreg
-                    conditionalPanel(
-                      condition = "$.inArray('Histogram', input.GCPlotOptions_downreg) > -1", 
-                      h5(id="GChistogramG_downreg_text", "Histogram of Downregulated Gene Connectivity"),
-                      plotOutput(outputId = "GChistogramGdownreg", height = "500px",),
-                    ),
-
-                    # density (subset by clusters) - downreg
-                    conditionalPanel(
-                      condition = "$.inArray('Clustered Density', input.GCPlotOptions_downreg) > -1", 
-                      h5(id="GCdensitySubsetG_downreg_text", "Density plot of Downregulated Gene Connectivity subset by their clusters"), 
-                      plotOutput(outputId = "GCdensitySubsetGdownreg", height = "500px",),
-                    ),
-
-                    # histogram (subset by clusters) - downreg
-                    conditionalPanel(
-                      condition = "$.inArray('Clustered Histogram', input.GCPlotOptions_downreg) > -1", 
-                      h5(id="GChistogramSubsetG_downreg_text", "Histogram of Dowregulated Gene Connectivity subset by their clusters"), 
-                      plotOutput(outputId = "GChistogramSubsetGdownreg", height = "500px",),
-                    ),
-
-
-                  )
+                  ),
                 ),
                 
-                # FUNCTIONAL OUTLIERS
-                tabPanel(
-                  title="Functional Outliers",
+                ########################### FUNCTIONAL OUTLIERS ###########################
+
+                tabPanel(title = "Functional Outliers",
                   
                   mainPanel(
                     h3("Functional Outliers"),
 
                     # options dropdown
                     dropdown(
-                      inputId = "FO_dropdown_DE",
+                      inputId = "DE_FO_options",
                       style = "minimal", icon = "OPTIONS",
                       status = "primary", width = "300px", size = "sm",
 
+                      # select plots
                       awesomeCheckboxGroup(
-                        inputId = "FOPlotOptions_DE", 
+                        inputId = "DE_FO_options_plots", 
                         label = tags$h4("Select Plots"),
                         choices = c("Upregulated Network", "Upregulated Heatmap", "Downregulated Network", "Downregulated Heatmap"), 
                         status = ""
                       ),
 
-                      # select tables
-                      # awesomeCheckboxGroup(
-                      #     inputId = "FO_table_options",
-                      #     label = tags$h4("Select Tables"),
-                      #     choices = c("Functional Outliers", "Genes in Module"),
-                      #     status = ""
-                      # ),
-
-                      # other options
-                      tags$h4("Other"),
-                      
                       # filt_min slider
-                      sliderInput("filtmin", label = "Number of Genes to form Module",
-                          min = 0, max = 20, value = 6, step = 1
+                      tags$h4("Other"),
+                      sliderInput(
+                        inputId = "DE_FO_filtmin",
+                        label = "Number of Genes to form Module",
+                        min = 0, max = 20, value = 6, step = 1
                       ),
-
-                      br(),
                       
                       # run button
-                      actionButton(inputId = "runFODE", label = "Run", ),
+                      actionButton(inputId = "DE_FO_run", label = "Run"),
 
                     ),
-
-                    br(),
                     
                     # error message
-                    textOutput("FO_error_DE"),
+                    p(id = "DE_FO_error", "Please generate a subnetwork in OPTIONS.", style = "color:red"),
+                    br(),
+                    
 
-                  ),
-                  br(),
-                  
-                  tabsetPanel(
+                    tabsetPanel(
 
-                    # plots tab
-                    tabPanel(
-                      br(),
-                      title="Plots",
-                      br(),
-                      
+                      # plots tab
+                      tabPanel(title = "Plots",                      
 
-                      conditionalPanel(
-                        condition = "$.inArray('Upregulated Network', input.FOPlotOptions_DE) > -1", 
-                        h5(id="FOnetwork_upreg_text", "Upregulated Network"), 
-                        plotOutput(outputId = "FOnetwork_upreg", height = "500px"), 
-                      ), 
+                        # upregulated - network
+                        conditionalPanel(
+                          condition = "$.inArray('Upregulated Network', input.DE_FO_options_plots) > -1", 
+                          h5(id = "DE_FO_up_network_text", "Upregulated Network"), 
+                          plotOutput(outputId = "DE_FO_up_network_plot", height = "500px"), 
+                        ), 
 
-                      conditionalPanel(
-                        condition = "$.inArray('Upregulated Heatmap', input.FOPlotOptions_DE) > -1",
-                        h5(id="FOheatmap_upreg_text", "Upregulated Heatmap"), 
-                        plotOutput(outputId = "FOheatmap_upreg", height = "500px"),
-                      ), 
+                        # upregulated - heatmap
+                        conditionalPanel(
+                          condition = "$.inArray('Upregulated Heatmap', input.DE_FO_options_plots) > -1",
+                          h5(id = "DE_FO_up_heatmap_text", "Upregulated Heatmap"), 
+                          plotOutput(outputId = "DE_FO_up_heatmap_plot", height = "500px"),
+                        ), 
 
-                      conditionalPanel(
-                        condition = "$.inArray('Downregulated Network', input.FOPlotOptions_DE) > -1", 
-                        h5(id="FOnetwork_downreg_text", "Downregulated Network"), 
-                        plotOutput(outputId = "FOnetwork_downreg", height = "500px"),
-                      ), 
+                        # downregulated - network
+                        conditionalPanel(
+                          condition = "$.inArray('Downregulated Network', input.DE_FO_options_plots) > -1", 
+                          h5(id = "DE_FO_down_network_text", "Downregulated Network"), 
+                          plotOutput(outputId = "DE_FO_down_network_plot", height = "500px"),
+                        ), 
 
-                      conditionalPanel(
-                        condition = "$.inArray('Downregulated Heatmap', input.FOPlotOptions_DE) > -1", 
-                        h5(id="FOheatmap_downreg_text", "Downregulated Heatmap"), 
-                        plotOutput(outputId = "FOheatmap_downreg", height = "500px"),
+                        # upregulated - heatmap
+                        conditionalPanel(
+                          condition = "$.inArray('Downregulated Heatmap', input.DE_FO_options_plots) > -1", 
+                          h5(id = "DE_FO_down_heatmap_text", "Downregulated Heatmap"), 
+                          plotOutput(outputId = "DE_FO_down_heatmap_plot", height = "500px"),
+                        ),
+
                       ),
 
+                      # tables tab
+                      tabPanel(title="Tables", 
+
+                        # selected genes table output
+                        # conditionalPanel(
+                        #   condition = "$.inArray('Genes in Module', input.GL_FO_options_tables) > -1", 
+                        #   h5(id = "GL_FO_in_text", "Genes in Module"), 
+                        #   br(),
+                        #   fluidRow(
+                        #     column( 11,
+                        #             dataTableOutput("GL_FO_in_table"),
+                        #     )
+                        #   ),
+                        # ),
+
+                        # br(),
+
+                        # # unselected genes table output
+                        # conditionalPanel(
+                        #   condition = "$.inArray('Functional Outliers', input.GL_FO_options_tables) > -1", 
+                        #   h5(id = "GL_FO_out_text", "Outliers"), 
+                        #   br(),
+                        #   fluidRow(
+                        #     column( 11,
+                        #             dataTableOutput("GL_FO_out_table"),
+                        #     )
+                        #   ),
+                        # ),
+                      ),
                     ),
-
-                    # tables tab
-                    tabPanel(
-                      br(),
-                      title="Tables", 
-                      br(),
-
-                      # selected genes table output
-                      # conditionalPanel(
-                      #   condition = "$.inArray('Genes in Module', input.FO_table_options) > -1", 
-                      #   h5(id="genes_not_keep_table_text", "Genes in Module"), 
-                      #   br(),
-                      #   fluidRow(
-                      #     column( 11,
-                      #             dataTableOutput("genes_not_keep_table"),
-                      #     )
-                      #   ),
-                      # ),
-
-                      # br(),
-
-                      # # unselected genes table output
-                      # conditionalPanel(
-                      #   condition = "$.inArray('Functional Outliers', input.FO_table_options) > -1", 
-                      #   h5(id="genes_keep_table_text", "Outliers"), 
-                      #   br(),
-                      #   fluidRow(
-                      #     column( 11,
-                      #             dataTableOutput("genes_keep_table"),
-                      #     )
-                      #   ),
-                      # ),
-                    )
                   ),
+                  
+                  
                 ),
 
-                # GENE SET ENRICHMENT ANALYSIS
-                tabPanel(
-                  title="Gene Set Enrichment Analysis",
+                ########################### GSEA ###########################
+
+                tabPanel(title = "Gene Set Enrichment Analysis",
+                  
                   mainPanel(
                     h3("Gene Set Enrichment Analysis"),
                     
@@ -700,92 +760,87 @@ ui <- fluidPage(
                           status = ""
                         ),
                       ),
-                      
-                      br(),
 
                       # run button
-                      actionButton(
-                        inputId = "DE_GSEA_run",
-                        label = "Run",
-                        style="color: #fff; background-color: #3E3F3A; border-color: #20201F"
-                      ),
+                      actionButton(inputId = "DE_GSEA_run", label = "Run"),
 
                     ),
-                    
-                    br(),
 
                     # error message
-                    textOutput("DE_GSEA_error"),
-                  ),
-                  br(),
-                  
-                  tabsetPanel(
+                    p(id = "DE_GSEA_error", "Please generate a subnetwork in OPTIONS.", style = "color:red"),
+                    br(),
 
-                    # Standard GSEA tab
-                    tabPanel(
-                      title="Standard",
-                      mainPanel(
+                    tabsetPanel(
 
-                        # upregulated heatmap
-                        conditionalPanel(
-                          condition = "$.inArray('Upregulated P-value Heatmap', input.GSEA_std_PlotOptions) > -1", 
-                          h5(id="GSEA_up_heatmap_text", "Upregulated P-value Heatmap"), 
-                          br(),
-                          plotOutput(outputId = "GSEA_up_heatmap", height = "500px"),
-                        ),
+                      # Standard GSEA tab
+                      tabPanel(title="Standard",
+                      
+                        mainPanel(
 
-                        # downregulated heatmap
-                        conditionalPanel(
-                          condition = "$.inArray('Downregulated P-value Heatmap', input.GSEA_std_PlotOptions) > -1", 
-                          h5(id="GSEA_down_heatmap_text", "Downregulated P-value Heatmap"), 
-                          br(),
-                          plotOutput(outputId = "GSEA_down_heatmap", height = "500px"),
-                        ),
+                          # upregulated heatmap
+                          conditionalPanel(
+                            condition = "$.inArray('Upregulated P-value Heatmap', input.GSEA_std_PlotOptions) > -1", 
+                            h5(id = "GSEA_up_heatmap_text", "Upregulated P-value Heatmap"), 
+                            br(),
+                            plotOutput(outputId = "GSEA_up_heatmap", height = "500px"),
+                          ),
 
-                      )
-                    ),
+                          # downregulated heatmap
+                          conditionalPanel(
+                            condition = "$.inArray('Downregulated P-value Heatmap', input.GSEA_std_PlotOptions) > -1", 
+                            h5(id = "GSEA_down_heatmap_text", "Downregulated P-value Heatmap"), 
+                            br(),
+                            plotOutput(outputId = "GSEA_down_heatmap", height = "500px"),
+                          ),
 
-                    # AUCs GSEA tab
-                    tabPanel(
-                      title="AUC",
-                      mainPanel(
-                        # AUROC graph
+                        )
+                      ),
+
+                      # AUCs GSEA tab
+                      tabPanel(title = "AUC",
+
+                        # AUCs graphs
                         conditionalPanel(
                           condition = "$.inArray('AUCs GSEA', input.GSEA_type) > -1", 
                           plotOutput(outputId = "GSEA_auc", height = "500px"),
                         ),
-                        br(),
-
-                      )
-                    ),
-                  )
+                      ),
+                    )
+                  ),
 
                 ),
 
 
                ),
-             ),
+            ),
 
-             ############################## ASSESS GENE LIST TAB ##################################################
+            ######################################################################
+            #                                                                    #
+            #                       ASSESS GENE LIST TAB                         #
+            #                                                                    #
+            ######################################################################
              
-             tabPanel(
-              title = "Assess Gene List",
+             tabPanel(title = "Assess Gene List",
 
-              # dropdown
+              # options dropdown
               dropdown(
+
+                # dropdown characteristics
+                style = "jelly", icon = "NETWORK OPTIONS",
+                status = "primary", width = "300px", size = "sm",
 
                 # network selection
                 tags$h4("Network Selection"),
                 selectInput(
-                  inputId = "network_type",
-                  label=NULL,
+                  inputId = "GL_options_network",
+                  label = NULL,
                   choices = c("Blood", "Brain", "Generic"),
                   selected = "Generic"
                 ),
 
                 # gene list selection
                 radioButtons(
-                  inputId = "gene_list_selection",
+                  inputId = "GL_options_gene_list",
                   label = tags$h4("Gene List Selection"),
                   choices = c("Upload Gene List", "Generate Gene List"),
                   selected = ""
@@ -793,69 +848,67 @@ ui <- fluidPage(
 
                 # generate gene list
                 conditionalPanel(
-                  condition = "input.gene_list_selection == 'Generate Gene List'", 
+                  condition = "input.GL_options_gene_list == 'Generate Gene List'", 
+
+                  # choose chromosome
                   textInput(
-                    inputId = 'chooseChrome', 
+                    inputId = 'GL_chrome', 
                     label = 'Choose Chromosome' , 
                     placeholder = "chrX"
                   ),
+
+                  # choose number of genes
                   textInput(
-                    inputId = 'chooseGeneNo', 
+                    inputId = 'GL_genes_no', 
                     label = 'Choose Number of Genes',
                     placeholder = "100"
                   ),
                 ),
 
-                # gene list upload
+                # upload gene list
                 conditionalPanel(
-                  condition = "input.gene_list_selection == 'Upload Gene List'", 
-                  # upload file
+                  condition = "input.GL_options_gene_list == 'Upload Gene List'",
+
+                  # upload gene list
                   fileInput(
-                    inputId = "DEFile", 
+                    inputId = "GL_gene_list", 
                     label = "Choose Gene List File",
                     accept = c(".csv", ".tsv", ".txt")
                   ),
-                  # div(style = "margin-top: -25px"),
-                  # select delimiter (default is nothing until file is selected and handled in server side)
-                  radioButtons(
-                    inputId = 'sepButton', 
+
+                  radioButtons( # select delimiter
+                    inputId = 'GL_gene_list_sep', 
                     label = 'Delimiter Selector', 
                     choices = c(Default=''), 
                     selected = ''
                   ),
                 ),
 
-                
-                
                 # generate subnet button
-                actionButton("generate_subnet", "Generate Subnetwork",),
+                actionButton("generate_subnet", "Generate Subnetwork"),
       
-                # side panel characteristics
-                style = "jelly", icon = "NETWORK OPTIONS",
-                status = "primary", width = "300px", size = "sm",
 
               ),
 
               br(),
         
-              
-              
               navlistPanel(
                 widths = c(3, 9), well = FALSE,
 
-                # VIEW FILES
-                tabPanel(
-                  title="View Files",
+                ########################### VIEW FILES ###########################
+
+                tabPanel(title = "View Files",
+
                   tabsetPanel(
-                    id="subnetwork_file_tabset",
+                    id = "GL_VF_tabset",
+
                      # view file tab
-                    tabPanel(
-                      title="File",
+                    tabPanel(title = "File",
                       uiOutput("UIDEContent"),
                     ),
+                    
                     # view subnetwork tab
-                    tabPanel(
-                      title="Subnetwork", 
+                    tabPanel(title = "Subnetwork", 
                       tableOutput("subnetwork")
                     ),
 
@@ -863,80 +916,77 @@ ui <- fluidPage(
                   ),
                 ),
 
-                # CLUSTER GENES
-                tabPanel(
-                  title="Cluster Genes",
+                ########################### CLUSTER GENES ###########################
+
+                tabPanel(title = "Cluster Genes",
+
                   mainPanel(
                     h3("Cluster Genes"),
+
+                    # options dropdown
                     dropdown(
+
                       inputId = "CG_dropdown",
+
+                      # dropdown characteristics
                       style = "minimal", icon = "OPTIONS",
                       status = "primary", width = "300px", size = "sm",
 
                       # select plots
                       awesomeCheckboxGroup(
-                        inputId = "clusterPlotOptions_genelist",
+                        inputId = "GL_CG_options_plots",
                         label = tags$h4("Select Plots"), 
                         choices = c("Network", "Heatmap", "Binarized Heatmap"),
                         status = ""
                       ),
 
                       # run button
-                      actionButton(inputId = "run", label = "Run",),
+                      actionButton(inputId = "GL_CG_run", label = "Run",),
                     ),  
 
                     # error message
-                    textOutput("CG_error"),
+                    p(id = "GL_CG_error", "Please generate a subnetwork in OPTIONS.", style = "color:red"),
                     br(),
+
                     tabsetPanel(
 
                       # plots tab
-                      tabPanel(
-                        br(),
-                        title="Plots",
+                      tabPanel(title = "Plots",
                         br(),
 
                         # network
                         conditionalPanel(
-                          condition = "$.inArray('Network', input.clusterPlotOptions_genelist) > -1", 
-                          h5(id="CG_network_text", "Network of Clustered Genes"), 
+                          condition = "$.inArray('Network', input.GL_CG_options_plots) > -1", 
+                          h5(id = "GL_CG_network_text", "Network of Clustered Genes"), 
+                          plotOutput(outputId = "GL_CG_network_plot", height = "500px"),
                           br(),
-                          plotOutput(outputId = "network", height = "500px"),
                         ),
                         
                         # heatmap
                         conditionalPanel(
-                          condition = "$.inArray('Heatmap', input.clusterPlotOptions_genelist) > -1", 
-                          h5(id="CG_heatmap_text", "Heatmap of Clustered Genes"),
+                          condition = "$.inArray('Heatmap', input.GL_CG_options_plots) > -1", 
+                          h5(id = "GL_CG_heatmap_text", "Heatmap of Clustered Genes"),
+                          plotOutput(outputId = "GL_CG_heatmap_plot", height = "500px"),
                           br(),
-                          plotOutput(outputId = "heatmap", height = "500px"),
                         ),
 
                         # binarized heatmap
                         conditionalPanel(
-                          condition = "$.inArray('Binarized Heatmap', input.clusterPlotOptions_genelist) > -1", 
-                          h5(id="CG_bheatmap_text", "Binarized Heatmap of Clustered Genes"), 
+                          condition = "$.inArray('Binarized Heatmap', input.GL_CG_options_plots) > -1", 
+                          h5(id = "GL_CG_bheatmap_text", "Binarized Heatmap of Clustered Genes"), 
+                          plotOutput(outputId = "GL_CG_bheatmap_plot", height = "500px"), 
                           br(),
-                          plotOutput(outputId = "Bheatmap", height = "500px"), 
                         ),
 
                       
                       ),
 
                       # tables tab
-                      tabPanel(
-                        br(),
-                        title="Tables",
+                      tabPanel(title = "Tables",
                         br(),
 
-                        # clustering genes
-                        h5(id="CG_table_text", "Clustering Genes"), 
-                        br(),
-                        fluidRow(
-                          column(11,
-                                  dataTableOutput("CG_table"),
-                          )
-                        ),
+                        # cluster genes table
+                        fluidRow(column(11, dataTableOutput("GL_CG_table_plot"),)),
                       ),
                       
                     ), 
@@ -944,20 +994,24 @@ ui <- fluidPage(
                   ), 
                 ), 
 
-                # GENE CONNECTIVITY
-                tabPanel(
-                  title = "Gene Connectivity", 
+                ########################### GENE CONNECTIVITY ###########################
+
+                tabPanel(title = "Gene Connectivity", 
+
                   mainPanel(
                     h3("Gene Connectivity"),
+                    
                     # options dropdown
                     dropdown(
-                      inputId = "GC_dropdown",
+                      inputId = "GL_GC_options",
+
+                      # dropdown characteristics
                       style = "minimal", icon = "OPTIONS",
                       status = "primary", width = "300px", size = "sm",
 
                       # select plots
                       awesomeCheckboxGroup(
-                        inputId = "GCPlotOptions_genelist",
+                        inputId = "GL_GC_options_plots",
                         label = tags$h4("Select Plots"), 
                         choices = c("Density", "Histogram", "Clustered Density", "Clustered Histogram"),
                         status = ""
@@ -965,84 +1019,78 @@ ui <- fluidPage(
                       
                       # breaks slider
                       conditionalPanel(
-                        condition = "$.inArray('Histogram', input.GCPlotOptions_genelist) > -1 || $.inArray('Clustered Histogram', input.GCPlotOptions_genelist) > -1" ,
+                        condition = "$.inArray('Histogram', input.GL_GC_options_plots) > -1 || $.inArray('Clustered Histogram', input.GL_GC_options_plots) > -1" ,
                         tags$h4("Other"),
                         sliderInput(
-                          inputId="xybreaks", 
+                          inputId = "GL_GC_options_xybreaks", 
                           label = "Number of breaks for histogram:",
                           min = 10, max = 100, value = 100, step = 10,
                         ),
                       ),
                       
-                      br(),
-
                       # run button
-                      actionButton(inputId = "runGC", label = "Run", ),
+                      actionButton(inputId = "GL_GC_run", label = "Run"),
 
                     ),
 
 
                     # error message
-                    textOutput("GC_error"),
+                    p(id = "GL_GC_error", "Please generate a subnetwork in OPTIONS.", style = "color:red"),
+                    br(),
 
                     # density
                     conditionalPanel(
-                      br(),
-                      condition = "$.inArray('Density', input.GCPlotOptions_genelist) > -1", 
-                      h5(id="GCdensityG_text", "Density Plot of Gene Connectivity"), 
-                      br(),
-                      plotOutput(outputId = "GCdensityG", height = "500px",),
+                      condition = "$.inArray('Density', input.GL_GC_options_plots) > -1", 
+                      h5(id = "GL_GC_density_text", "Density Plot of Gene Connectivity"),
+                      plotOutput(outputId = "GL_GC_density_plot", height = "500px",),
                       br(),
                     ),
 
                     # histogram
                     conditionalPanel(
-                      br(),
-                      condition = "$.inArray('Histogram', input.GCPlotOptions_genelist) > -1", 
-                      h5(id="GChistogramG_text", "Histogram of Gene Connectivity"),
-                      br(),
-                      plotOutput(outputId = "GChistogramG", height = "500px",),
+                      condition = "$.inArray('Histogram', input.GL_GC_options_plots) > -1", 
+                      h5(id = "GL_GC_hist_text", "Histogram of Gene Connectivity"),
+                      plotOutput(outputId = "GL_GC_hist_plot", height = "500px",),
                       br(),
                     ),
 
                     # density (subset by clusters)
                     conditionalPanel(
-                      br(),
-                      condition = "$.inArray('Clustered Density', input.GCPlotOptions_genelist) > -1", 
-                      h5(id="GCdensitySubsetG_text", "Density plot of Gene Connectivity subset by their clusters"), 
-                      br(),
-                      plotOutput(outputId = "GCdensitySubsetG", height = "500px",),
+                      condition = "$.inArray('Clustered Density', input.GL_GC_options_plots) > -1", 
+                      h5(id = "GL_GC_density_subset_text", "Density plot of Gene Connectivity subset by their clusters"), 
+                      plotOutput(outputId = "GL_GC_density_subset_plot", height = "500px",),
                       br(),
                     ),
 
                     # histogram (subset by clusters)
                     conditionalPanel(
-                      br(),
-                      condition = "$.inArray('Clustered Histogram', input.GCPlotOptions_genelist) > -1", 
-                      h5(id="GChistogramSubsetG_text", "Histogram of Gene Connectivity subset by their clusters"), 
-                      br(),
-                      plotOutput(outputId = "GChistogramSubsetG", height = "500px",),
+                      condition = "$.inArray('Clustered Histogram', input.GL_GC_options_plots) > -1", 
+                      h5(id = "GL_GC_hist_subset_text", "Histogram of Gene Connectivity subset by their clusters"), 
+                      plotOutput(outputId = "GL_GC_hist_subset_plot", height = "500px",),
                       br(),
                     ),
 
                   ),
                 ), 
 
-                # FUNCTIONAL OUTLIERS
-                tabPanel(
-                  title = "Functional Outliers",
+                ########################### FUNCTIONAL OUTLIERS ###########################
+
+                tabPanel(title = "Functional Outliers",
+
                   mainPanel(
                     h3("Functional Outliers"),
 
                     # options dropdown
                     dropdown(
-                      inputId = "FO_dropdown",
+                      inputId = "GL_FO_options",
+
+                      # dropdown characteristics
                       style = "minimal", icon = "OPTIONS",
                       status = "primary", width = "300px", size = "sm",
 
                       # select plots
                       awesomeCheckboxGroup(
-                        inputId = "FOPlotOptions_genelist",
+                        inputId = "GL_FO_options_plots",
                         label = tags$h4("Select Plots"),
                         choices = c("Network", "Heatmap"),
                         status = ""
@@ -1050,7 +1098,7 @@ ui <- fluidPage(
 
                       # select tables
                       awesomeCheckboxGroup(
-                          inputId = "FO_table_options",
+                          inputId = "GL_FO_options_tables",
                           label = tags$h4("Select Tables"),
                           choices = c("Functional Outliers", "Genes in Module"),
                           status = ""
@@ -1060,19 +1108,17 @@ ui <- fluidPage(
                       tags$h4("Other"),
                       
                       # filt_min slider
-                      sliderInput("filtmin", label = "Number of Genes to form Module",
+                      sliderInput("GL_FO_filtmin", label = "Number of Genes to form Module",
                           min = 0, max = 20, value = 6, step = 1
                       ),
 
-                      br(),
-                      
                       # run button
-                      actionButton(inputId = "runFO", label = "Run", ),
+                      actionButton(inputId = "GL_FO_run", label = "Run"),
 
                     ),
                     
                     # error message
-                    textOutput("FO_error"),
+                    p(id = "GL_FO_error", "Please generate a subnetwork in OPTIONS.", style = "color:red"),
 
                   ), 
 
@@ -1082,60 +1128,46 @@ ui <- fluidPage(
                   tabsetPanel(
 
                     # plots tab
-                    tabPanel(
+                    tabPanel(title="Plots",
                       br(),
-                      title="Plots",
-                      br(),
-                      
+
                       # heatmap
                       conditionalPanel(
-                        condition = "$.inArray('Network', input.FOPlotOptions_genelist) > -1", 
-                        h5(id="FO_network_text", "Network"), 
-                        plotOutput(outputId = "FO_network", height = "500px"),
+                        condition = "$.inArray('Network', input.GL_FO_options_plots) > -1", 
+                        h5(id = "GL_FO_network_text", "Network"), 
+                        plotOutput(outputId = "GL_FO_network_plot", height = "500px"),
+                        br(),
                       ),
 
                       # network
                       conditionalPanel(
-                        condition = "$.inArray('Heatmap', input.FOPlotOptions_genelist) > -1", 
-                        h5(id="FO_heatmap_text", "Heatmap"), 
-                        plotOutput(outputId = "FO_heatmap", height = "500px"),
+                        condition = "$.inArray('Heatmap', input.GL_FO_options_plots) > -1", 
+                        h5(id = "GL_FO_heatmap_text", "Heatmap"), 
+                        plotOutput(outputId = "GL_FO_heatmap_plot", height = "500px"),
+                        br(),
                         
                       ),
-
-                      
 
                     ),
 
                     # tables tab
-                    tabPanel(
-                      br(),
-                      title="Tables", 
+                    tabPanel(title="Tables", 
                       br(),
 
                       # selected genes table output
                       conditionalPanel(
-                        condition = "$.inArray('Genes in Module', input.FO_table_options) > -1", 
-                        h5(id="genes_not_keep_table_text", "Genes in Module"), 
+                        condition = "$.inArray('Genes in Module', input.GL_FO_options_tables) > -1", 
+                        h5(id = "GL_FO_in_text", "Genes in Module"), 
+                        fluidRow(column(11, dataTableOutput("GL_FO_in_table"))),
                         br(),
-                        fluidRow(
-                          column( 11,
-                                  dataTableOutput("genes_not_keep_table"),
-                          )
-                        ),
                       ),
-
-                      br(),
 
                       # unselected genes table output
                       conditionalPanel(
-                        condition = "$.inArray('Functional Outliers', input.FO_table_options) > -1", 
-                        h5(id="genes_keep_table_text", "Outliers"), 
+                        condition = "$.inArray('Functional Outliers', input.GL_FO_options_tables) > -1", 
+                        h5(id = "GL_FO_out_text", "Outliers"), 
+                        fluidRow(column(11, dataTableOutput("GL_FO_out_table"))),
                         br(),
-                        fluidRow(
-                          column( 11,
-                                  dataTableOutput("genes_keep_table"),
-                          )
-                        ),
                       ),
                     )
                   ),
@@ -1143,56 +1175,51 @@ ui <- fluidPage(
 
                 ),
 
-                # GENE SET ENRICHMENT ANALYSIS
-                tabPanel(
-                  title="Gene Set Enrichment Analysis",
+                ########################### GSEA ###########################
+
+                tabPanel(title = "Gene Set Enrichment Analysis",
+
                   mainPanel(
                     h3("Gene Set Enrichment Analysis"),
                     
                     # options dropdown
                     dropdown(
-                      inputId = "GL_GSEA_dropdown",
+                      inputId = "GL_GSEA_options",
+
+                      # dropdown characteristics
                       style = "minimal", icon = "OPTIONS",
                       status = "primary", width = "300px", size = "sm",
                       
                       # standard GSEA options
                       awesomeCheckboxGroup(
-                        inputId = "GL_GSEA_std_PlotOptions",
+                        inputId = "GL_GSEA_options_std",
                         label = tags$h4("Standard GSEA"), 
                         choices = c("P-value Heatmap"),
                         status = ""
                       ),
                       
-                      br(),
-
                       # run button
-                      actionButton(
-                        inputId = "GL_GSEA_run",
-                        label = "Run",
-                        style="color: #fff; background-color: #3E3F3A; border-color: #20201F"
-                      ),
+                      actionButton(inputId = "GL_GSEA_run", label = "Run"),
 
                     ),
-                    
-                    br(),
 
                     # error message
-                    textOutput("GL_GSEA_error"),
-                  ),
-                  br(),
+                    p(id = "GL_GSEA_error", "Please generate a subnetwork in OPTIONS.", style = "color:red"),
+                    br(),
                   
-                  # heatmap
-                  conditionalPanel(
-                    condition = "$.inArray('P-value Heatmap', input.GL_GSEA_std_PlotOptions) > -1", 
-                    h5(id="GSEA_heatmap_text", "P-value Heatmap"), 
-                    plotOutput(outputId = "GL_GSEA_heatmap", height = "500px"),
+                    # heatmap
+                    conditionalPanel(
+                      condition = "$.inArray('P-value Heatmap', input.GL_GSEA_options_std) > -1", 
+                      h5(id = "GL_GSEA_heatmap_text", "P-value Heatmap"), 
+                      plotOutput(outputId = "GL_GSEA_heatmap_plot", height = "500px"),
+                      br(),
+                    ),
                   ),
-                  br(),
-
                 ),
 
               ),
 
             ),
+
   )
 )
