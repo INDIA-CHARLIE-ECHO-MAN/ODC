@@ -71,7 +71,7 @@ ui <- fluidPage(
                 
                 ########################### DIFFERENTIAL ANALYSIS ###########################
 
-                tabPanel(title = "Differential Analysis",
+                tabPanel(title = "Differential Expression Analysis",
                   h3("Differential Expression Analysis"),
                   p("Statistical analysis to discover quantitative changes in expression levels between experimental groups."),
                   h5("Methods:"),
@@ -81,8 +81,6 @@ ui <- fluidPage(
                   p("Uses geometric normalisation to analyse count data and test for differential expression."),
                   h6(strong("edgeR")),
                   p("Uses weighted mean of log ratio to analyse count data and test for differential expression."),
-                  br(),
-                  em("Note: This tool is under construction")
                 ),
 
                 ########################### CLUSTER GENES ###########################
@@ -99,8 +97,6 @@ ui <- fluidPage(
                   img(src="plot_network_down.png", height = 200),
                   h6(strong("Binarized heatmap")),  
                   p("up-regulated or down-regulated binary co-expression sub-network"),
-                  br(),
-                  em("Note: This tool is under construction")
                 ),
 
                 ########################### GENE CONNECTIVITY ###########################
@@ -117,8 +113,6 @@ ui <- fluidPage(
                   img(src="plot_scatter_hist_up.png", height = 200),
                   h6(strong("Subset by clusters")),  
                   img(src="plot_scatter_hist_down_colored.png", height = 200), 
-                  br(),
-                  em("Note: This tool is under construction"),
                 ),
                  
                 ########################### FUNCTIONAL OUTLIERS ###########################
@@ -137,8 +131,6 @@ ui <- fluidPage(
                   img(src="plot_network_down.png", height = 200),
                   h6(strong("Table")),
                   p("Genes Filtered and Genes Remaining"),
-                  br(),
-                  em("Note: This tool is under construction"),
                 ),
                 
                 ########################### GSEA ###########################
@@ -154,8 +146,6 @@ ui <- fluidPage(
                   img(src="go_enrich.png", height = 200),
                   h6(strong("Ranking")),
                   img(src="go_enrich_ranked.png", height = 200),
-                  br(),
-                  em("Note: This tool is under construction")
                 ),
                  
               )
@@ -221,7 +211,7 @@ ui <- fluidPage(
                     # counts file
                     tabPanel(
                       title = "Counts File",
-                      dataTableOutput("UICountsContent")
+                      dataTableOutput("DE_run_counts_table")
                     ),
 
                     # labels file
@@ -695,7 +685,7 @@ ui <- fluidPage(
                       ),
 
                       # tables tab
-                      tabPanel(title="Tables", 
+                      tabPanel(title = "Tables", 
 
                         # selected genes table output
                         # conditionalPanel(
@@ -738,7 +728,7 @@ ui <- fluidPage(
                     
                     # options dropdown
                     dropdown(
-                      inputId = "DE_GSEA_dropdown",
+                      inputId = "DE_GSEA_options",
                       style = "minimal", icon = "OPTIONS",
                       status = "primary", width = "300px", size = "sm",
                       
@@ -780,7 +770,7 @@ ui <- fluidPage(
                           # upregulated heatmap
                           conditionalPanel(
                             condition = "$.inArray('Upregulated P-value Heatmap', input.GSEA_std_PlotOptions) > -1", 
-                            h5(id = "GSEA_up_heatmap_text", "Upregulated P-value Heatmap"), 
+                            h5(id = "DE_GSEA_up_heatmap_text", "Upregulated P-value Heatmap"), 
                             br(),
                             plotOutput(outputId = "GSEA_up_heatmap", height = "500px"),
                           ),
@@ -788,7 +778,7 @@ ui <- fluidPage(
                           # downregulated heatmap
                           conditionalPanel(
                             condition = "$.inArray('Downregulated P-value Heatmap', input.GSEA_std_PlotOptions) > -1", 
-                            h5(id = "GSEA_down_heatmap_text", "Downregulated P-value Heatmap"), 
+                            h5(id = "DE_GSEA_down_heatmap_text", "Downregulated P-value Heatmap"), 
                             br(),
                             plotOutput(outputId = "GSEA_down_heatmap", height = "500px"),
                           ),
@@ -882,6 +872,13 @@ ui <- fluidPage(
                     choices = c(Default=''), 
                     selected = ''
                   ),
+
+                  radioButtons( # select gene list type
+                    inputId = 'GL_gene_list_type', 
+                    label = 'Gene List Type', 
+                    choices = c("Gene Names", "Entrez Id"), 
+                    selected = ''
+                  ),
                 ),
 
                 # generate subnet button
@@ -926,7 +923,7 @@ ui <- fluidPage(
                     # options dropdown
                     dropdown(
 
-                      inputId = "CG_dropdown",
+                      inputId = "GL_CG_options",
 
                       # dropdown characteristics
                       style = "minimal", icon = "OPTIONS",
