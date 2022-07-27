@@ -1298,7 +1298,7 @@ server <- function(input, output, session) {
       data(go_voc)
       gene_list <- clust_net()$genes$clusters$genes[clust_net()$genes$order]
       
-      if (input$GL_gene_list_type == "Gene Names") {
+      if (input$gene_list_selection == "Generate Gene List" || input$GL_gene_list_type == "Gene Names") {
         data(go_slim)
         output$GL_GSEA_heatmap_plot <- renderPlot(
           {
