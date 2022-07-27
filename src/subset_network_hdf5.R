@@ -45,54 +45,49 @@ subset_network_hdf5 <- function(deg, network_type = "generic",
                                 dir = "") {
 
 
-    if (network_type == "generic" | network_type == "generic230"
-        | network_type == "generic75neg"
-        | network_type == "blood" | network_type == "brain") {
-        if (flag_occr == T) {
-            network_type <- paste0(network_type, ".occr")
-        }
+  # if (network_type == "generic" | network_type == "generic230"
+  #     | network_type == "generic75neg"
+  #     | network_type == "blood" | network_type == "brain") {
+      if (flag_occr == T) {
+          network_type <- paste0(network_type, ".occr")
+      }
 
-        genes_hdf5 <- paste0(dir, network_type, ".genes.h5")
-        median_hdf5 <- paste0(dir, network_type, ".med.h5")
+      genes_hdf5 <- paste0(dir, network_type, ".genes.h5")
+      median_hdf5 <- paste0(dir, network_type, ".med.h5")
 
-        genes <- rhdf5::h5read(genes_hdf5, "genes")
-        colnames(genes) <- c("entrezID", "name", "ensemblID")
+      genes <- rhdf5::h5read(genes_hdf5, "genes")
+      colnames(genes) <- c("entrezID", "name", "ensemblID")
 
-        median_net <- rhdf5::h5read(median_hdf5, "median")
+      median_net <- rhdf5::h5read(median_hdf5, "median")
 
-        net_hdf5 <- paste0(dir, network_type, ".net.h5")
+      net_hdf5 <- paste0(dir, network_type, ".net.h5")
 
-        # Check genes (probably should make this a sep function)
-        grep_res <- grep ("^ENSG", head ( rownames(deg)  )  )
+      # Check genes (probably should make this a sep function)
+      grep_res <- grep ("^ENSG", head ( rownames(deg)  )  )
 
-        if( length(grep_res ) >0 ) {
-            # set genes to ensemblID
-            genes <- genes[,3]
+      if( length(grep_res ) >0 ) {
+          # set genes to ensemblID
+          genes <- genes[,3]
 
-        } else {
-            # check if entrez IDs
-             grep_res <- grep ("^\\d+", head ( rownames(deg)  )  )
+      } else {
+          # check if entrez IDs
+            grep_res <- grep ("^\\d+", head ( rownames(deg)  )  )
 
-             # if true, set to entrez ID
-             if( length(grep_res ) >0 ) {
-                 genes <- genes[,1]
-             # if not, set to gene symbols/names
-             } else {
-                genes <- genes[,2]
-             }
-        }
-    }
-
+            # if true, set to entrez ID
+            if( length(grep_res ) >0 ) {
+                genes <- genes[,1]
+            # if not, set to gene symbols/names
+            } else {
+              genes <- genes[,2]
+            }
+      }
+    #}
     deg <- deg[is.finite(deg$log2_fc) ,]
-
-
-
     m <- match(rownames(deg), genes)
     f_m <- !is.na(m)
     f_am <- m[f_m]
-
     deg_sub <- deg[f_m,]
-
+    # location of bug #TODO
     m_cpm <- log2(deg_sub[, 1])
     fc    <- deg_sub[, 2]
     padj  <- p.adjust(deg_sub[,3], method="fdr" )
@@ -101,7 +96,6 @@ subset_network_hdf5 <- function(deg, network_type = "generic",
     deg_sig <- list()
     fc_sig <- list()
     node_degrees <- list()
-
     if (method == "top") {
         fc_temp = fc
         fc_temp[ m_cpm <= log2(min_cpm)  ] = 0
@@ -173,7 +167,7 @@ subset_network_hdf5_gene_list <- function(gene_list, network_type = "generic",
                                           flag_occr = TRUE, dir = "") {
 
 
-  if (network_type == "generic" | network_type == "generic230" | network_type == "generic75neg"  | network_type == "blood" | network_type == "brain") {
+#  if (network_type == "generic" | network_type == "generic230" | network_type == "generic75neg"  | network_type == "blood" | network_type == "brain") {
     if (flag_occr == TRUE) {
       network_type <- paste0(network_type, ".occr")
     }
@@ -209,7 +203,7 @@ subset_network_hdf5_gene_list <- function(gene_list, network_type = "generic",
       }
     }
 
-  }
+#  }
 
   m <- match(gene_list, genes)
   f_m <- !is.na(m)

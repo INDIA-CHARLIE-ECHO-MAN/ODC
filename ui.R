@@ -332,11 +332,15 @@ ui <- fluidPage(
                 status = "primary", width = "300px", size = "sm",
 
                 # network selection
-                selectInput(
-                  inputId = "DE_options_network",
-                  label = tags$h4("Network Selection"),
-                  choices = c("Blood", "Brain", "Generic"),
-                  selected = "Generic"
+                tags$h4("Network Selection"),
+                uiOutput("select.folder"),
+
+                # occr network selection
+                radioButtons(
+                  inputId = "is_occr",
+                  label = "Use occr network?",
+                  choices = c("Yes", "No"),
+                  selected = "No"
                 ),
 
                 # gene list selection
@@ -346,7 +350,6 @@ ui <- fluidPage(
                   choices = c("Use DE Results"),
                   selected = "Use DE Results"
                 ),
-                
                 # generate subnet button
                 actionButton("DE_generate_subnet", "Generate Subnetwork",),
 
@@ -475,9 +478,7 @@ ui <- fluidPage(
                           plotOutput(outputId = "DE_CG_down_bheatmap_plot", height = "500px"),
                           br(), 
                         ),
-
                       ),
-
                     )
                   )
                 ),
@@ -821,11 +822,14 @@ ui <- fluidPage(
 
                 # network selection
                 tags$h4("Network Selection"),
-                selectInput(
-                  inputId = "GL_options_network",
-                  label = NULL,
-                  choices = c("Blood", "Brain", "Generic"),
-                  selected = "Generic"
+                uiOutput("select.folder_gene_list"),
+
+                # occr network selection
+                radioButtons(
+                  inputId = "is_occr_gene_list",
+                  label = "Use occr network?",
+                  choices = c("Yes", "No"),
+                  selected = "No"
                 ),
 
                 # gene list selection
@@ -865,20 +869,6 @@ ui <- fluidPage(
                     label = "Choose Gene List File",
                     accept = c(".csv", ".tsv", ".txt")
                   ),
-
-                  radioButtons( # select delimiter
-                    inputId = 'GL_gene_list_sep', 
-                    label = 'Delimiter Selector', 
-                    choices = c(Default=''), 
-                    selected = ''
-                  ),
-
-                  radioButtons( # select gene list type
-                    inputId = 'GL_gene_list_type', 
-                    label = 'Gene List Type', 
-                    choices = c("Gene Names", "Entrez Id"), 
-                    selected = ''
-                  ),
                 ),
 
                 # generate subnet button
@@ -908,8 +898,6 @@ ui <- fluidPage(
                     tabPanel(title = "Subnetwork", 
                       tableOutput("subnetwork")
                     ),
-
-                   
                   ),
                 ),
 
@@ -974,8 +962,6 @@ ui <- fluidPage(
                           plotOutput(outputId = "GL_CG_bheatmap_plot", height = "500px"), 
                           br(),
                         ),
-
-                      
                       ),
 
                       # tables tab
@@ -985,9 +971,7 @@ ui <- fluidPage(
                         # cluster genes table
                         fluidRow(column(11, dataTableOutput("GL_CG_table_plot"),)),
                       ),
-                      
                     ), 
-
                   ), 
                 ), 
 
@@ -1026,8 +1010,7 @@ ui <- fluidPage(
                       ),
                       
                       # run button
-                      actionButton(inputId = "GL_GC_run", label = "Run"),
-
+                      actionButton(inputId = "GL_GC_run", label = "Run", ),
                     ),
 
 
