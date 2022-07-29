@@ -330,7 +330,7 @@ server <- function(input, output, session) {
   observe({
     if (!is.null(input$labels_file) && !is.null(input$labels_file)) {
       show(id="DE_options")
-      hide(id="runDE_error")
+      hide(id="DE_plot_error")
     }
   })
   
@@ -698,11 +698,11 @@ server <- function(input, output, session) {
 
     if (success == TRUE) {
       show(id = "CG_dropdown_DE")
-      hide(id = "CG_error_DE")
+      hide(id = "DE_CG_error")
       show(id = "GC_dropdown_DE")
-      hide(id = "GC_error_DE")
+      hide(id = "DE_GC_error")
       show(id = "FO_dropdown_DE")
-      hide(id = "FO_error_DE")
+      hide(id = "DE_FO_error")
       # GSEA
       show(id = "DE_GSEA_dropdown")
       hide(id = "DE_GSEA_error")
@@ -1664,11 +1664,11 @@ server <- function(input, output, session) {
         }
         if (success == TRUE) {
             show(id = "CG_dropdown")
-            hide(id = "CG_error")
+            hide(id = "GL_CG_error")
             show(id = "GC_dropdown")
-            hide(id = "GC_error")
+            hide(id = "GL_GC_error")
             show(id = "FO_dropdown")
-            hide(id = "FO_error")
+            hide(id = "GL_FO_error")
             show(id = "GL_GSEA_options")
             show(id = "GL_GSEA_dropdown")
             hide(id = "GL_GSEA_error")
@@ -2206,43 +2206,4 @@ server <- function(input, output, session) {
     
     }
   )
-
-
-
-  ##################### ERROR MESSAGES #####################
-
-  output$CG_error <- renderText({
-    print("Please generate a subnetwork in NETWORK OPTIONS")
-  })
-
-  output$CG_error_DE <- renderText({
-    print("Please generate a subnetwork in NETWORK OPTIONS")
-  })
-
-  output$GC_error <- renderText({
-    print("Please generate a subnetwork in NETWORK OPTIONS")
-  }) 
-
-  output$GC_error_DE <- renderText({
-    print("Please generate a subnetwork in NETWORK OPTIONS")
-  })
-
-  output$FO_error <- renderText({
-    print("Please generate a subnetwork in NETWORK OPTIONS")
-  }) 
-
-  output$FO_error_DE <- renderText({
-    print("Please generate a subnetwork in NETWORK OPTIONS")
-  })
-
-  output$DE_GSEA_error <- renderText({
-    print("Please generate a subnetwork in NETWORK OPTIONS")
-  }) 
-
-  output$GL_GSEA_error <- renderText({
-    print("Please generate a subnetwork in NETWORK OPTIONS")
-  }) 
-
 }
-
-
