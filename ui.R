@@ -1332,14 +1332,7 @@ ui <- fluidPage(
                       awesomeCheckboxGroup(
                         inputId = "GL_GSEA_options_std",
                         label = tags$h4("Standard GSEA"), 
-                        choices = c("P-value Heatmap"),
-                        status = ""
-                      ),
-
-                      # compare standard GSEA and heatmap options
-                      awesomeCheckbox(
-                        inputId = "GL_GSEA_options_compare",
-                        choices = c("Compare GSEA to heatmap"),
+                        choices = c("P-value Heatmap", "Compare GSEA to heatmap"),
                         status = ""
                       ),
                       
@@ -1360,20 +1353,21 @@ ui <- fluidPage(
                       br(),
                     ),
 
-                    conditionalPanel(
-                      condition = "$.inArray('GL_GSEA_options_compare', input.GL_GSEA_options_std) > -1",
-                      splitLayout(cellWidths = c("50%", "50%"),
-                        fluidPage(
-                          h5(id = "GL_GSEA_compare_heatmap_text", "P-value Heatmap"), 
-                          plotOutput(outputId = "GL_GSEA_heatmap_plot", height = "500px")
-                        ),
+                    # conditionalPanel(
+                    # condition = "$.inArray('Compare GSEA to heatmap', input.GL_GSEA_options_std) > -1",
+                    print("oieoie"),
+                    splitLayout(cellWidths = c("50%", "50%"),
+                      fluidPage(
+                        h5(id = "GL_GSEA_compare_heatmap_text", "P-value Heatmap"), 
+                        plotOutput(outputId = "GL_GSEA_heatmap_plot", height = "500px")
+                      ),
 
-                        fluidPage(
-                          h5(id = "GL_GSEA_compare_heatmap_text", "Heatmap of Clustered Genes"), 
-                          plotOutput(outputId = "heatmap", height = "500px"),
-                        )
+                      fluidPage(
+                        h5(id = "GL_GSEA_compare_heatmap_text", "Heatmap of Clustered Genes"), 
+                        plotOutput(outputId = "heatmap", height = "500px"),
                       )
-                    ),
+                    )
+                    # ),
                   ),
                 ),
 
