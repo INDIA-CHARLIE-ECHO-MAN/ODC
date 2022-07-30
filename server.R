@@ -489,9 +489,6 @@ server <- function(input, output, session) {
     output$AssessDE_table <- renderDataTable(
         {DE_table()},
     )
-
-
-
   })
 
   
@@ -509,10 +506,7 @@ server <- function(input, output, session) {
     } else {
       read.table(file=ServerDEFile$datapath, sep=input$sepDEButton, header=TRUE)
     }
-    
-    
   })
-
 
 
   # Upload own DE data
@@ -2158,6 +2152,7 @@ server <- function(input, output, session) {
           width = 500,
           height = 500
         )
+        
       } else {
         data(go_slim_entrez)
         output$GL_GSEA_heatmap_plot <- renderPlot(
@@ -2169,9 +2164,16 @@ server <- function(input, output, session) {
           width = 500,
           height = 500
         )
+        output$GL_GSEA_heatmap_compare <- renderPlot(
+          {
+            filt <- colSums(go_slim_entrez) < 5000 & colSums(go_slim_entrez) >= 10
+            go_enrich <- gene_set_enrichment(gene_list, go_slim_entrez[filt,], go_voc)
+            plot_gene_set_enrichment(go_enrich, gene_list, go_slim_entrez[filt,])
+          },
+          width = 500,
+          height = 500
+        )
       }
-      
-      
 
       # heatmap
       show(id="GSEA_heatmap_text")
@@ -2202,8 +2204,6 @@ server <- function(input, output, session) {
           dev.off()
         }
       )
-    
-    
     }
   )
 
