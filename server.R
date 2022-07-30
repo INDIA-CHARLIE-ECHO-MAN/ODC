@@ -2034,7 +2034,7 @@ server <- function(input, output, session) {
         },
         content = function(file) {
           if (input$ASSESS_GENE_LIST_download_format == ".png") {
-            png(file, width=1500, height=1500)
+            png(file, width=3000, height=3000)
           } else if (input$ASSESS_GENE_LIST_download_format == ".pdf") {
             pdf(file)
           }
@@ -2049,7 +2049,7 @@ server <- function(input, output, session) {
         },
         content = function(file) {
           if (input$ASSESS_GENE_LIST_download_format == ".png") {
-            png(file, width=1500, height=1500)
+            png(file, width=3000, height=3000)
           } else if (input$ASSESS_GENE_LIST_download_format == ".pdf") {
             pdf(file)
           }
@@ -2064,7 +2064,7 @@ server <- function(input, output, session) {
         },
         content = function(file) {
           if (input$ASSESS_GENE_LIST_download_format == ".png") {
-            png(file, width=1500, height=1500)
+            png(file, width=3000, height=3000)
           } else if (input$ASSESS_GENE_LIST_download_format == ".pdf") {
             pdf(file)
           }
@@ -2164,7 +2164,7 @@ server <- function(input, output, session) {
         },
         content = function(file) {
           if (input$ASSESS_GENE_LIST_download_format == ".png") {
-            png(file, width=1500, height=1500)
+            png(file, width=3000, height=3000)
           } else if (input$ASSESS_GENE_LIST_download_format == ".pdf") {
             pdf(file)
           }
@@ -2179,7 +2179,7 @@ server <- function(input, output, session) {
         },
         content = function(file) {
           if (input$ASSESS_GENE_LIST_download_format == ".png") {
-            png(file, width=1500, height=1500)
+            png(file, width=3000, height=3000)
           } else if (input$ASSESS_GENE_LIST_download_format == ".pdf") {
             pdf(file)
           }
@@ -2194,7 +2194,7 @@ server <- function(input, output, session) {
         },
         content = function(file) {
           if (input$ASSESS_GENE_LIST_download_format == ".png") {
-            png(file, width=1500, height=1500)
+            png(file, width=3000, height=3000)
           } else if (input$ASSESS_GENE_LIST_download_format == ".pdf") {
             pdf(file)
           }
@@ -2209,7 +2209,7 @@ server <- function(input, output, session) {
         },
         content = function(file) {
           if (input$ASSESS_GENE_LIST_download_format == ".png") {
-            png(file, width=1500, height=1500)
+            png(file, width=3000, height=3000)
           } else if (input$ASSESS_GENE_LIST_download_format == ".pdf") {
             pdf(file)
           } 
@@ -2312,7 +2312,7 @@ server <- function(input, output, session) {
         },
         content = function(file) {
           if (input$ASSESS_GENE_LIST_download_format == ".png") {
-            png(file, width=1500, height=1500)
+            png(file, width=3000, height=3000)
           } else if (input$ASSESS_GENE_LIST_download_format == ".pdf") {
             pdf(file)
           }
@@ -2327,7 +2327,7 @@ server <- function(input, output, session) {
         },
         content = function(file) {
           if (input$ASSESS_GENE_LIST_download_format == ".png") {
-            png(file, width=1500, height=1500)
+            png(file, width=3000, height=3000)
           } else if (input$ASSESS_GENE_LIST_download_format == ".pdf") {
             pdf(file)
           }
@@ -2378,6 +2378,25 @@ server <- function(input, output, session) {
           width = 500,
           height = 500
         )
+        output$GL_GSEA_heatmap_compare <- renderPlot(
+          {
+            filt <- colSums(go_slim) < 5000 & colSums(go_slim) >= 10
+            go_enrich <- gene_set_enrichment(gene_list, go_slim[filt,], go_voc)
+            plot_gene_set_enrichment(go_enrich, gene_list, go_slim[filt,])
+          },
+          width = 500,
+          height = 500
+        )
+        output$GL_GSEA_heatmap_cluster_compare <- renderPlot(
+          {
+            sub_net <- sn$sub_nets$sub_net
+            node_degrees <- sn$sub_nets$node_degrees
+            medK <- as.numeric(sn$sub_nets$median)
+            plot_coexpression_heatmap(sub_net$genes, clust_net()$genes, flag_plot_bin = FALSE)
+          },
+            width = 500,
+            height = 500
+        )
       } else {
         data(go_slim_entrez)
         output$GL_GSEA_heatmap_plot <- renderPlot(
@@ -2388,6 +2407,25 @@ server <- function(input, output, session) {
           },
           width = 500,
           height = 500
+        )
+        output$GL_GSEA_heatmap_compare <- renderPlot(
+          {
+            filt <- colSums(go_slim_entrez) < 5000 & colSums(go_slim_entrez) >= 10
+            go_enrich <- gene_set_enrichment(gene_list, go_slim_entrez[filt,], go_voc)
+            plot_gene_set_enrichment(go_enrich, gene_list, go_slim_entrez[filt,])
+          },
+          width = 500,
+          height = 500
+        )
+        output$GL_GSEA_heatmap_cluster_compare <- renderPlot(
+          {
+            sub_net <- sn$sub_nets$sub_net
+            node_degrees <- sn$sub_nets$node_degrees
+            medK <- as.numeric(sn$sub_nets$median)
+            plot_coexpression_heatmap(sub_net$genes, clust_net()$genes, flag_plot_bin = FALSE)
+          },
+            width = 500,
+            height = 500
         )
       }
       
