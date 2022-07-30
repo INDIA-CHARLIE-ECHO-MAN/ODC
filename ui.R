@@ -1315,7 +1315,7 @@ ui <- fluidPage(
                         awesomeCheckboxGroup(
                           inputId="GSEA_std_PlotOptions",
                           label=tags$h4("Standard GSEA"), 
-                          choices=c("Upregulated P-value Heatmap", "Downregulated P-value Heatmap"),
+                          choices=c("Upregulated P-value Heatmap", "Compare upregulated P-value to Clustered Heatmap", "Downregulated P-value Heatmap", "Compare downregulated P-value to Clustered Heatmap"),
                           status=""
                         ),
                       ),
@@ -1354,6 +1354,22 @@ ui <- fluidPage(
                           div(style="margin-left: 400px;", downloadLink("GSEA_up_heatmap_download", label="Download", class="download_style")),
                         ),
 
+                        # upregulated compare
+                        conditionalPanel(
+                          condition="$.inArray('Compare upregulated P-value to Clustered Heatmap', input.GSEA_std_PlotOptions) > -1", 
+                          splitLayout(cellWidths = c("50%", "50%"),
+                            fluidPage(
+                              h5(id = "DE_GSEA_compare_heatmap", "Upregulated P-value Heatmap"), 
+                              plotOutput(outputId = "DE_GSEA_heatmap_compare", height = "500px")
+                            ),
+
+                            fluidPage(
+                              h5(id = "DE_GSEA_compare_heatmap_text", "Upregulated Heatmap of Clustered Genes"), 
+                              plotOutput(outputId = "DE_GSEA_heatmap_cluster_compare", height = "500px"),
+                            )
+                          )
+                        ),
+
                         # downregulated heatmap
                         conditionalPanel(
                           condition="$.inArray('Downregulated P-value Heatmap', input.GSEA_std_PlotOptions) > -1", 
@@ -1362,6 +1378,22 @@ ui <- fluidPage(
                           plotOutput(outputId="GSEA_down_heatmap", height="500px"),
                           div(style="margin-left: 400px;", downloadLink("GSEA_down_heatmap_download", label="Download", class="download_style")),
                         ),
+
+                        # #downregulated compare
+                        # conditionalPanel(
+                        #   condition="$.inArray('Compare downregulated P-value to Clustered Heatmap', input.GSEA_std_PlotOptions) > -1", 
+                        #   splitLayout(cellWidths = c("50%", "50%"),
+                        #     fluidPage(
+                        #       h5(id = "DE_GSEA_compare_heatmap_text", "Downregulated P-value Heatmap"), 
+                        #       plotOutput(outputId = "GL_GSEA_heatmap_compare", height = "500px")
+                        #     ),
+
+                        #     fluidPage(
+                        #       h5(id = "DE_GSEA_compare_heatmap_text", "Downregulated Heatmap of Clustered Genes"), 
+                        #       plotOutput(outputId = "GL_GSEA_heatmap_cluster_compare", height = "500px"),
+                        #     )
+                        #   )
+                        # )
 
                       )
                     ),
@@ -1830,7 +1862,7 @@ ui <- fluidPage(
                       awesomeCheckboxGroup(
                         inputId="GL_GSEA_options_std",
                         label=tags$h4("Standard GSEA"), 
-                        choices=c("P-value Heatmap", "Compare GSEA to heatmap"),
+                        choices=c("P-value Heatmap", "Compare P-value to Clustered Heatmap"),
                         status=""
                       ),
                       
@@ -1852,7 +1884,7 @@ ui <- fluidPage(
                     ),
 
                     conditionalPanel(
-                      condition = "$.inArray('Compare GSEA to heatmap', input.GL_GSEA_options_std) > -1",
+                      condition = "$.inArray('Compare P-value to Clustered Heatmap', input.GL_GSEA_options_std) > -1",
                       splitLayout(cellWidths = c("50%", "50%"),
                         fluidPage(
                           h5(id = "GL_GSEA_compare_heatmap_text", "P-value Heatmap"), 
