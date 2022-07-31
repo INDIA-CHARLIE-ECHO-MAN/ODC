@@ -1601,13 +1601,13 @@ server <- function(input, output, session) {
           height = 500
         )
 
-        # upregulated compare
-        # DE
-        output$DE_UP_GSEA_heatmap_compare <- renderPlot{
-          {GSEA_up_heatmap()},
-          width = 500, 
-          height = 500
-        }
+        # # upregulated compare
+        # # DE
+        # output$DE_UP_GSEA_heatmap_compare <- renderPlot{
+        #   {GSEA_up_heatmap()},
+        #   width = 500, 
+        #   height = 500
+        # }
         
         # GSEA
         
