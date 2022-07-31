@@ -182,7 +182,7 @@ ui <- fluidPage(
                         br(),
 
                         h5(strong("Step 2")),
-                        p("Ensure the", code("networks"), "folder is in parent directory of the package."),
+                        p("Ensure the", code("networks"), "folder is in same directory as the package."),
                         p("Inside", code("networks"), "are subfolders titled with the name of the network and contain network files in HDF5 (.h5) format."), 
                         br(),
 
@@ -1055,7 +1055,7 @@ ui <- fluidPage(
                       conditionalPanel(
                         condition="$.inArray('Histogram', input.GCPlotOptions_upreg) > -1 || $.inArray('Clustered Histogram', input.GCPlotOptions_upreg) > -1 || $.inArray('Histogram', input.GCPlotOptions_downreg) > -1 || $.inArray('Clustered Histogram', input.GCPlotOptions_downreg) > -1" ,
                         sliderInput(
-                          inputId="xybreaks_DE", 
+                          "xybreaks_DE", 
                           label="Number of breaks for histogram:",
                           min=10, max=100, value=100, step=10,
                         ),
@@ -1326,7 +1326,6 @@ ui <- fluidPage(
                       actionButton(
                         inputId="DE_GSEA_run",
                         label="Run",
-                        style="color: #fff; background-color: #3E3F3A; border-color: #20201F"
                       ),
 
                     ),
@@ -1670,7 +1669,7 @@ ui <- fluidPage(
                         condition="$.inArray('Histogram', input.GCPlotOptions_genelist) > -1 || $.inArray('Clustered Histogram', input.GCPlotOptions_genelist) > -1" ,
                         tags$h4("Other"),
                         sliderInput(
-                          inputId="xybreaks", 
+                          "xybreaks", 
                           label="Number of breaks for histogram:",
                           min=10, max=100, value=100, step=10,
                         ),
