@@ -855,7 +855,7 @@ server <- function(input, output, session) {
       updateAwesomeCheckboxGroup(inputId = "GCPlotOptions_downreg", choices =  c("Density", "Histogram", "Clustered Density", "Clustered Histogram"), status = "")
       updateAwesomeCheckboxGroup(inputId = "FO_upreg_options", choices = c("Network", "Heatmap", "Genes in Module", "Functional Outliers"), status = "")
       updateAwesomeCheckboxGroup(inputId = "GSEA_type",choices = c("Standard GSEA", "AUCs GSEA"),status = "",)
-      updateAwesomeCheckboxGroup(inputId = "GSEA_std_PlotOptions",choices = c("Upregulated P-value Heatmap", "Downregulated P-value Heatmap"),status = "")
+      updateAwesomeCheckboxGroup(inputId = "GSEA_std_PlotOptions",choices = c("Upregulated P-value Heatmap", "Compare upregulated P-value to Clustered Heatmap", "Downregulated P-value Heatmap", "Compare downregulated P-value to Clustered Heatmap"),status = "")
       # Clear plots
       output$upregNetwork <- NULL
       output$upregHeatmap <- NULL
@@ -1600,7 +1600,18 @@ server <- function(input, output, session) {
           width = 500,
           height = 500
         )
+
+        # upregulated compare
+        # DE
+        output$DE_UP_GSEA_heatmap_compare <- renderPlot{
+          {GSEA_up_heatmap()},
+          width = 500, 
+          height = 500
+        }
         
+        # GSEA
+        
+
         # downregulated heatmap
         show(id="GSEA_down_heatmap_text")
         show(id="GSEA_down_heatmap_download")
@@ -1613,6 +1624,8 @@ server <- function(input, output, session) {
           width = 500,
           height = 500
         )
+
+        # downregulated compare
       }
 
       # AUCs GSEA

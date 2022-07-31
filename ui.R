@@ -1360,12 +1360,12 @@ ui <- fluidPage(
                           splitLayout(cellWidths = c("50%", "50%"),
                             fluidPage(
                               h5(id = "DE_GSEA_compare_heatmap", "Upregulated P-value Heatmap"), 
-                              plotOutput(outputId = "DE_GSEA_heatmap_compare", height = "500px")
+                              plotOutput(outputId = "DE_UP_GSEA_heatmap_compare", height = "500px")
                             ),
 
                             fluidPage(
                               h5(id = "DE_GSEA_compare_heatmap_text", "Upregulated Heatmap of Clustered Genes"), 
-                              plotOutput(outputId = "DE_GSEA_heatmap_cluster_compare", height = "500px"),
+                              plotOutput(outputId = "DE_UP_GSEA_heatmap_cluster_compare", height = "500px"),
                             )
                           )
                         ),
@@ -1379,21 +1379,21 @@ ui <- fluidPage(
                           div(style="margin-left: 400px;", downloadLink("GSEA_down_heatmap_download", label="Download", class="download_style")),
                         ),
 
-                        # #downregulated compare
-                        # conditionalPanel(
-                        #   condition="$.inArray('Compare downregulated P-value to Clustered Heatmap', input.GSEA_std_PlotOptions) > -1", 
-                        #   splitLayout(cellWidths = c("50%", "50%"),
-                        #     fluidPage(
-                        #       h5(id = "DE_GSEA_compare_heatmap_text", "Downregulated P-value Heatmap"), 
-                        #       plotOutput(outputId = "GL_GSEA_heatmap_compare", height = "500px")
-                        #     ),
+                        #downregulated compare
+                        conditionalPanel(
+                          condition="$.inArray('Compare downregulated P-value to Clustered Heatmap', input.GSEA_std_PlotOptions) > -1", 
+                          splitLayout(cellWidths = c("50%", "50%"),
+                            fluidPage(
+                              h5(id = "DE_GSEA_compare_heatmap_text", "Downregulated P-value Heatmap"), 
+                              plotOutput(outputId = "DE_DN_GSEA_heatmap_compare", height = "500px")
+                            ),
 
-                        #     fluidPage(
-                        #       h5(id = "DE_GSEA_compare_heatmap_text", "Downregulated Heatmap of Clustered Genes"), 
-                        #       plotOutput(outputId = "GL_GSEA_heatmap_cluster_compare", height = "500px"),
-                        #     )
-                        #   )
-                        # )
+                            fluidPage(
+                              h5(id = "DE_GSEA_compare_heatmap_text", "Downregulated Heatmap of Clustered Genes"), 
+                              plotOutput(outputId = "DE_DN_GSEA_heatmap_cluster_compare", height = "500px"),
+                            )
+                          )
+                        )
 
                       )
                     ),
